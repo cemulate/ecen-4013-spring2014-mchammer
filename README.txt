@@ -1,1 +1,1 @@
-Initialized repo
+After cloning this repository, you can set up an MPLAB project in the same directory, and still push and pull. The .gitignore file is set up to ignore the MPLAB project files and such.
