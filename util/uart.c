@@ -68,3 +68,21 @@ void uart1Rx(char *buffer, int length) {
     // REFERENCE:
     // PIC24HJ64GP502 Datasheet, section 18
 }
+
+void uprint_int(char *message, int value) {
+
+    int size = strlen(message);
+    char buf[size + 10];
+    sprintf(buf, "\r\n%s%d", message, value);
+    uart1Tx(buf);
+
+}
+
+void uprint_dec(char *message, double value) {
+
+    int size = strlen(message);
+    char buf[size + 10];
+    sprintf(buf, "\r\n%s%.3f", message, value);
+    uart1Tx(buf);
+
+}

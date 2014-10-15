@@ -13,5 +13,8 @@ void configureUART1();
 void uart1Tx(char *message);
 void uart1Rx(char *buffer, int length);
 
+void uprint_int(char *message, int value);
+void uprint_dec(char *message, double value);
+
 #endif	/* UART_H */
 

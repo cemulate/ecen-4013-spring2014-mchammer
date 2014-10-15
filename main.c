@@ -61,6 +61,9 @@ int main(int argc, char** argv) {
 
     configureUART1();           // Set up UART1 module w/ baud 9600
 
+    uprint_int("This should print 5: ", 5);
+    uprint_dec("This should print 3.300: ", 3.3);
+
     blinkCommandLine();
 
     return (EXIT_SUCCESS);
