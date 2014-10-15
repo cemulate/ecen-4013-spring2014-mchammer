@@ -53,8 +53,8 @@ int main(int argc, char** argv) {
 
     // REFERENCE: Datasheet sec 11.1
 
-    RPOR4bits.RP8R = 0b00011;   // Assign output U1TX to pin RP2
-    RPINR18bits.U1RXR = 6;      // Assign input U1RX to pin RP3
+    RPOR4bits.RP8R = 0b00011;   // Assign output U1TX to pin RP8
+    RPINR18bits.U1RXR = 6;      // Assign input U1RX to pin RP6
 
     // REFERENCE: Datasheet sec 11.6.2.2 and 11.6.2.1 respectively,
     // This is using Peripheral Pin Select (PPS)
