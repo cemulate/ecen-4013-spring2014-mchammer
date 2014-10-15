@@ -41,7 +41,7 @@
 
 // --------------------------------------------------------------
 
-#include "uart.h"
+#include "util/uart.h"
 
 void blinkForever();
 void blinkCommandLine();
