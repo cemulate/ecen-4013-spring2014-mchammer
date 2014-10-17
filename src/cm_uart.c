@@ -1,9 +1,10 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <p24HJ64GP502.h>
+#include <xc.h>
 
-#include "uart.h"
+#include "cm_uart.h"
 
 void configureUART1() {
 
@@ -26,37 +27,27 @@ void configureUART1() {
     // PIC24HJ64GP502 Datasheet, section 18
 }
 
-void uart1Tx(char *message) {
-
+void uart1_puts(char *message) {
     int size = strlen(message);
     int i = 0;
 
     for (i = 0; i < size; i ++) {
 
-        // Loop through each byte in message;
-        // Wait while the tx buffer is still full,
-        // and when it becomes empty, put another
-        // character in the transmit register
-
-        while (U1STAbits.UTXBF == 1);
-        U1TXREG = message[i];
+        uart1Tx(message[i]);
 
     }
-
-    // REFERENCE:
-    // PIC24HJ64GP502 Datasheet, section 18
 }
 
-void uart1Rx(char *buffer, int length) {
+void uart1Tx(char value) {
+    while (U1STAbits.UTXBF == 1);
+    U1TXREG = value;
+}
 
+void uart1_gets(char *buffer, int length) {
     int i = 0;
     for (i = 0; i < length; i ++) {
 
-        // Wait until there is data in the rx buffer
-        // then write it to the buffer
-
-        while (U1STAbits.URXDA == 0);
-        buffer[i] = U1RXREG;
+        buffer[i] = uart1Rx();
 
     }
 
@@ -64,9 +55,11 @@ void uart1Rx(char *buffer, int length) {
     // it with the null character
 
     buffer[i+1] = '\0';
+}
 
-    // REFERENCE:
-    // PIC24HJ64GP502 Datasheet, section 18
+char uart1Rx() {
+    while (U1STAbits.URXDA == 0);
+    return U1RXREG;
 }
 
 void uprint_int(char *message, int value) {
@@ -74,7 +67,7 @@ void uprint_int(char *message, int value) {
     int size = strlen(message);
     char buf[size + 10];
     sprintf(buf, "\r\n%s%d", message, value);
-    uart1Tx(buf);
+    uart1_puts(buf);
 
 }
 
@@ -83,6 +76,6 @@ void uprint_dec(char *message, double value) {
     int size = strlen(message);
     char buf[size + 10];
     sprintf(buf, "\r\n%s%.3f", message, value);
-    uart1Tx(buf);
+    uart1_puts(buf);
 
 }

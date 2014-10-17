@@ -41,14 +41,17 @@
 
 // --------------------------------------------------------------
 
-#include "uart.h"
-
-
+#include "cm_uart.h"
+#include "cm_spi.h"
 
 void blinkForever();
 void blinkCommandLine();
+void sMaster();
+void sSlave();
 
 int main(int argc, char** argv) {
+
+    AD1PCFGL = 0xFFFF;
 
     TRISAbits.TRISA2 = 0;       // Set pin RA2 to be digital output
     PORTAbits.RA2 = 1;          // Set pin RA2 high
@@ -63,12 +66,45 @@ int main(int argc, char** argv) {
 
     configureUART1();           // Set up UART1 module w/ baud 9600
 
-    uprint_int("This should print 5: ", 5);
-    uprint_dec("This should print 3.300: ", 3.3);
+    //blinkCommandLine();
 
-    blinkCommandLine();
+    RPOR0bits.RP0R = 0b00111;
+    RPOR0bits.RP1R = 0b01000;
+    RPOR1bits.RP2R = 0b01001;
+
+    RPINR20bits.SDI1R = 3;
+    RPINR20bits.SCK1R = 4;
+    RPINR21bits.SS1R = 5;
+
+    if (1) {
+        configureSPI1Master();
+        sMaster();
+    } else {
+        configureSPI1Slave();
+        sSlave();
+    }
 
     return (EXIT_SUCCESS);
+}
+
+void sMaster() {
+    uart1_puts("\r\nBeginning master operation");
+
+    int tx = 0;
+    while (1) {
+        tx++;
+        //uprint_int("\r\nSending: ", tx);
+        spi1Tx(tx);
+    }
+
+}
+
+void sSlave() {
+    uart1_puts("\r\nBeginning slave operation");
+    while (1) {
+        int value = spi1Rx();
+        uprint_int("\r\nReceieved through SPI: ", value);
+    }
 }
 
 void blinkForever() {
@@ -79,13 +115,13 @@ void blinkForever() {
 
         }
         PORTAbits.RA2 = ~PORTAbits.RA2;
-        uart1Tx("Blink...\r\n");
+        uart1_puts("Blink...\r\n");
     }
 }
 
 void blinkCommandLine() {
 
-    char rxbuf[2];
+    char rx;
     char confirm_message[50];
     int count = 0;
     long i = 0;
@@ -93,17 +129,17 @@ void blinkCommandLine() {
         // Set RA2 low
         PORTAbits.RA2 = 0;
 
-        uart1Tx("\r\n\r\n");
-        uart1Tx("Please enter a number between 1 and 9: ");
+        uart1_puts("\r\n\r\n");
+        uart1_puts("Please enter a number between 1 and 9: ");
 
-        uart1Rx(rxbuf, 1);
+        rx = uart1Rx();
 
-        uart1Tx("\r\n");
+        uart1_puts("\r\n");
 
-        int number = rxbuf[0] - 48;
+        int number = (int)rx - 48;
 
         sprintf(confirm_message, "Blinking %d times ... ", number);
-        uart1Tx(confirm_message);
+        uart1_puts(confirm_message);
 
         for (count = 0; count < number; count ++) {
 
