@@ -1,6 +1,6 @@
 /* 
  * File:   cm_spi.h
- * Author: Chase
+ * Author: Chase Meadors
  *
  * Created on October 16, 2014, 6:48 PM
  */

@@ -10,7 +10,7 @@
 #include <string.h>
 #include <math.h>
 
-#include <p24HJ64GP502.h>
+#include <xc.h>
 
 // --------------------- Configuration bits ---------------------
 
@@ -43,52 +43,37 @@
 
 #include "cm_uart.h"
 #include "cm_spi.h"
+#include "cm_adc.h"
+
+#include "radiohardware.h"
+#include "MRF24J40.h"
 
 void blinkForever();
 void blinkCommandLine();
+
 void sMaster();
 void sSlave();
 
 int main(int argc, char** argv) {
 
-    AD1PCFGL = 0xFFFF;
-
+    AD1PCFGL = 0xFFFF;          // Analog? Hell naw.
+    
     TRISAbits.TRISA2 = 0;       // Set pin RA2 to be digital output
     PORTAbits.RA2 = 1;          // Set pin RA2 high
 
-    // REFERENCE: Datasheet sec 11.1
-
-    RPOR4bits.RP8R = 0b00011;   // Assign output U1TX to pin RP8
-    RPINR18bits.U1RXR = 6;      // Assign input U1RX to pin RP6
-
-    // REFERENCE: Datasheet sec 11.6.2.2 and 11.6.2.1 respectively,
-    // This is using Peripheral Pin Select (PPS)
-
     configureUART1();           // Set up UART1 module w/ baud 9600
 
-    //blinkCommandLine();
+    configureADC(9);
 
-    RPOR0bits.RP0R = 0b00111;
-    RPOR0bits.RP1R = 0b01000;
-    RPOR1bits.RP2R = 0b01001;
-
-    RPINR20bits.SDI1R = 3;
-    RPINR20bits.SCK1R = 4;
-    RPINR21bits.SS1R = 5;
-
-    if (1) {
-        configureSPI1Master();
-        sMaster();
-    } else {
-        configureSPI1Slave();
-        sSlave();
+    while (1) {
+        uprint_dec("ADC value: ", readADCPercent());
     }
 
     return (EXIT_SUCCESS);
 }
 
 void sMaster() {
-    uart1_puts("\r\nBeginning master operation");
+    uprint("Beginning master operation");
 
     int tx = 0;
     while (1) {
@@ -100,10 +85,10 @@ void sMaster() {
 }
 
 void sSlave() {
-    uart1_puts("\r\nBeginning slave operation");
+    uprint("Beginning slave operation");
     while (1) {
         int value = spi1Rx();
-        uprint_int("\r\nReceieved through SPI: ", value);
+        uprint_int("Receieved through SPI: ", value);
     }
 }
 
@@ -115,7 +100,7 @@ void blinkForever() {
 
         }
         PORTAbits.RA2 = ~PORTAbits.RA2;
-        uart1_puts("Blink...\r\n");
+        uprint("Blink...");
     }
 }
 
@@ -129,17 +114,15 @@ void blinkCommandLine() {
         // Set RA2 low
         PORTAbits.RA2 = 0;
 
-        uart1_puts("\r\n\r\n");
-        uart1_puts("Please enter a number between 1 and 9: ");
+        uprint("\r\n");
+        uprint("Please enter a number between 1 and 9: ");
 
         rx = uart1Rx();
-
-        uart1_puts("\r\n");
 
         int number = (int)rx - 48;
 
         sprintf(confirm_message, "Blinking %d times ... ", number);
-        uart1_puts(confirm_message);
+        uprint(confirm_message);
 
         for (count = 0; count < number; count ++) {
 

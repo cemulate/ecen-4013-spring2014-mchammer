@@ -4,8 +4,18 @@
 #include <xc.h>
 
 #include "cm_spi.h"
+#include "cm_uart.h"
 
 void configureSPI1Master() {
+
+    // *********** PERIPHERAL PIN SELECT ***********
+    // Change this if needed
+
+    RPOR0bits.RP0R = 0b00111;       // Set output SDO1 to RP0
+    RPOR0bits.RP1R = 0b01000;       // Set output SCK1 to RP1
+    RPOR1bits.RP2R = 0b01001;       // Set output SS1 to RP2
+
+    // *********** PERIPHERAL PIN SELECT ***********
 
     // SPI1CON1 Register Settings
     SPI1CON1bits.DISSCK = 0;    //Internal Serial Clock is Enabled
@@ -21,6 +31,15 @@ void configureSPI1Master() {
 }
 
 void configureSPI1Slave() {
+
+    // *********** PERIPHERAL PIN SELECT ***********
+    // Change this if needed
+
+    RPINR20bits.SDI1R = 3;          // Set input SDI1 to RA3
+    RPINR20bits.SCK1R = 4;          // Set input SCK1 to RA4
+    RPINR21bits.SS1R = 5;           // Set intput SS1 to RA5
+
+    // *********** PERIPHERAL PIN SELECT ***********
 
     SPI1BUF = 0;
 

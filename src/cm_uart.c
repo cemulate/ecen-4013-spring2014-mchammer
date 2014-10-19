@@ -8,8 +8,14 @@
 
 void configureUART1() {
 
-    // Zeroing out U1MODE has the effect of giving us pretty much all
-    // the behavior we want, including 8-bit data, 1 stop bit, and no parity
+    // *********** PERIPHERAL PIN SELECT ***********
+    // Change this if needed
+
+    RPOR4bits.RP8R = 0b00011;   // Assign output U1TX to pin RP8
+    RPINR18bits.U1RXR = 6;      // Assign input U1RX to pin RP6
+    
+    // *********** PERIPHERAL PIN SELECT ***********
+
 
     U1MODE = 0x00;
 
@@ -21,10 +27,6 @@ void configureUART1() {
 
     U1MODEbits.UARTEN = 1;
     U1STAbits.UTXEN = 1;
-
-    // REFERENCE:
-    // dsPIC33/PIC24 Family Reference Manual - Chapter 17
-    // PIC24HJ64GP502 Datasheet, section 18
 }
 
 void uart1_puts(char *message) {
@@ -62,12 +64,17 @@ char uart1Rx() {
     return U1RXREG;
 }
 
+void uprint(char *message) {
+    uart1_puts("\r\n");
+    uart1_puts(message);
+}
+
 void uprint_int(char *message, int value) {
 
     int size = strlen(message);
     char buf[size + 10];
     sprintf(buf, "\r\n%s%d", message, value);
-    uart1_puts(buf);
+    uprint(buf);
 
 }
 
@@ -76,6 +83,6 @@ void uprint_dec(char *message, double value) {
     int size = strlen(message);
     char buf[size + 10];
     sprintf(buf, "\r\n%s%.3f", message, value);
-    uart1_puts(buf);
+    uprint(buf);
 
 }
