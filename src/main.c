@@ -48,6 +48,9 @@
 #include "radiohardware.h"
 #include "MRF24J40.h"
 
+#include "cm_accelerometer.h"
+#include "cm_soundeffects.h"
+
 void blinkForever();
 void blinkCommandLine();
 
@@ -63,9 +66,13 @@ int main(int argc, char** argv) {
     configureUART1();           // Set up UART1 module w/ baud 9600
     
     // Main logic loop
-    
+
     while (1) {
         
+        while (!checkSpinComplete());
+
+        playSound(SOUND_SPIN_COMPLETE);
+
         
         
     }
