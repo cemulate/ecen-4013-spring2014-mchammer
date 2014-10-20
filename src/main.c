@@ -57,9 +57,6 @@
 void blinkForever();
 void blinkCommandLine();
 
-void sMaster();
-void sSlave();
-
 int main(int argc, char** argv) {
 
     AD1PCFGL = 0xFFFF;          // Analog? Hell naw.
@@ -76,33 +73,13 @@ int main(int argc, char** argv) {
 
     // Set to 0 when compiling for receiver
     // Set to 1 when compiling for sender
-    if (0) {
 
-        // Sender
+    configureRadio(0x0A00, 0x0000111111111111);
 
-        configureRadio(0x0A00, 0x0000111111111111);
-
-        while (1) {
-            uprint("Enter character to send: ");
-            uart1_gets(rx, 1);
-            radioSendMessage(rx, 0x0A00);
-        }
-
+    if (1) {
+        radioSenderDemo();
     } else {
-
-        // Receiver
-
-        configureRadio(0x0A00, 0x0000111111111111);
-
-        while (1) {
-            uprint("Wating for message ...");
-
-            radioGetMessage(rx, 1);
-
-            uprint("Got message: ");
-            uprint(rx);
-        }
-
+        radioReceiverDemo();
     }
 
     return (EXIT_SUCCESS);
@@ -113,23 +90,33 @@ void setupLED() {
     PORTAbits.RA2 = 1;          // Set pin RA2 high
 }
 
-void sMaster() {
-    uprint("Beginning master operation");
-
-    int tx = 0;
-    while (1) {
-        tx++;
-        //uprint_int("\r\nSending: ", tx);
-        spi1Tx(tx);
-    }
-
+void blinkOnce() {
+    PORTAbits.RA2 = ~PORTAbits.RA2;
+    long i = 300000;
+    while (i--);
+    PORTAbits.RA2 = ~PORTAbits.RA2;
+    i = 300000;
+    while (i--);
 }
 
-void sSlave() {
-    uprint("Beginning slave operation");
+void radioSenderDemo() {
+    char rx[2];
     while (1) {
-        int value = spi1Rx();
-        uprint_int("Receieved through SPI: ", value);
+        uprint("Enter character to send: ");
+        uart1_gets(rx, 1);
+        radioSendMessage(rx, 0x0A00);
+    }
+}
+
+void radioReceiverDemo() {
+    char rx[2];
+    while (1) {
+        uprint("Wating for message ...");
+
+        radioGetMessage(rx, 1);
+
+        uprint("Got message: ");
+        uprint(rx);
     }
 }
 
