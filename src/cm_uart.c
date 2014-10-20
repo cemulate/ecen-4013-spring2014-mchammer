@@ -65,15 +65,15 @@ char uart1Rx() {
 }
 
 void uprint(char *message) {
-    uart1_puts("\r\n");
     uart1_puts(message);
+    uart1_puts("\r\n");
 }
 
 void uprint_int(char *message, int value) {
 
     int size = strlen(message);
     char buf[size + 10];
-    sprintf(buf, "\r\n%s%d", message, value);
+    sprintf(buf, "%s%d\r\n", message, value);
     uprint(buf);
 
 }
@@ -82,7 +82,7 @@ void uprint_dec(char *message, double value) {
 
     int size = strlen(message);
     char buf[size + 10];
-    sprintf(buf, "\r\n%s%.3f", message, value);
+    sprintf(buf, "%s%.3f\r\n", message, value);
     uprint(buf);
 
 }

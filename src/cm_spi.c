@@ -69,10 +69,6 @@ void spi1Tx(int data) {
 int spi1Rx() {
 
     while (SPI1STATbits.SPIRBF == 0);
-    if (SPI1STATbits.SPIROV == 1) {
-        uart1_puts("\r\nRX Overflow!!");
-        SPI1STATbits.SPIROV = 0;
-    }
     return SPI1BUF;
 
 }

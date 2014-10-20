@@ -6,7 +6,7 @@
 
 int checkSpinComplete() {
     
-    uart1_puts("Press key when spin is complete: ");
+    uprint("Press key when spin is complete: ");
     uart1Rx();
 
     return 1;

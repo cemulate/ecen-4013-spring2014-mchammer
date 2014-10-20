@@ -10,9 +10,14 @@
 
 typedef struct {
 
+    double health;
+    double chargeStatus;
     
 
 } HammerState;
+
+
+void HammerState_Init();
 
 #endif	/* HAMMERSTATE_H */
 

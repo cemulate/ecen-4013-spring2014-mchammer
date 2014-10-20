@@ -15,24 +15,24 @@ void	RadioHW_Init()
     RADIO_WAKE_TRIS = 0;
     RADIO_WAKE = 1;
 
-    // PPS
-
-    RPOR0bits.RP0R = 0b00111;       // output SDO1 to RP0
-    RPINR20bits.SDI1R = 1;          // input SDI1 to RP1
-    RPOR1bits.RP2R = 0b01000;       // output SCK1 to RP2
+    RPINR0bits.INT1R = RADIO_INT_PIN_NUM;
 
     #if defined(HARDWARE_SPI)
 
-    SPI1CON1bits.DISSCK = 0;    //Internal Serial Clock is Enabled
-    SPI1CON1bits.DISSDO = 0;    //SDOx pin is controlled by the module
-    SPI1CON1bits.MODE16 = 1;    //Communication is word-wide (16 bits)
-    SPI1CON1bits.SMP = 0;       //Input Data is sampled at the middle of data output time
-    SPI1CON1bits.CKE = 0;       //Serial output data changes on transition from
+    RPOR1bits.RP2R = 0b00111;       // output SDO1 to RP2
+    RPINR20bits.SDI1R = 3;          // input SDI1 to RP3
+    RPOR2bits.RP4R = 0b01000;       // output SCK1 to RP4
 
-    SPI1CON1bits.CKP = 0;       //Idle state for clock is a low level;
+    SPICON1 = SPICON1_VAL;
+    SPISTAT = SPISTAT_VAL;
 
-    SPI1CON1bits.MSTEN = 1;     //Master Mode Enabled
-    SPI1STATbits.SPIEN = 1;     //Enable SPI Module
-    
+    #else
+
+    RADIO_SDI_TRIS = 1;
+    RADIO_SDO_TRIS = 0;
+    RADIO_SCK_TRIS = 0;
+    RADIO_SPI_SDO = 0;
+    RADIO_SPI_SCK = 0;   
+
     #endif
 }

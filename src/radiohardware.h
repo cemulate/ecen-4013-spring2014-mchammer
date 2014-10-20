@@ -17,11 +17,12 @@
 // Peripheral Pin Select registers to the correct pins (Interrupt pin and SPI pins if HW SPI is uses).
 // This setting is for the Explorer 16 development board
 
-#define HARDWARE_SPI								// vs. software bit-bang (slower)
-#define USE_SPI		1								// Use SPI channel 1
-#define	SPI_CLKFREQ	(0x1e)							// Lowest 4 bits of SPICON1 that sets SPI clock speed
-													// 0x1e = FCY/4
+//#define HARDWARE_SPI								// vs. software bit-bang (slower)
+#define USE_SPI		1							// Use SPI channel 1
+#define	SPI_CLKFREQ	(0x00)							// Lowest 4 bits of SPICON1 that sets SPI clock speed
+										// 0x1e = FCY/4
 
+#define RADIO_INT_PIN_NUM       (14)
 #define RADIO_INT_PIN      	PORTBbits.RB14
 #define RADIO_INT_TRIS     	TRISBbits.TRISB14
 
@@ -33,12 +34,12 @@
 #define RADIO_WAKE_TRIS   	TRISBbits.TRISB11
 
 #ifndef HARDWARE_SPI
-    #define RADIO_SPI_SDI          	PORTFbits.RF7
-    #define RADIO_SDI_TRIS         	TRISFbits.TRISF7
-    #define RADIO_SPI_SDO          	LATFbits.LATF8
-    #define RADIO_SDO_TRIS         	TRISFbits.TRISF8
-    #define RADIO_SPI_SCK          	LATFbits.LATF6
-    #define RADIO_SCK_TRIS         	TRISFbits.TRISF6
+    #define RADIO_SPI_SDI          	PORTBbits.RB3
+    #define RADIO_SDI_TRIS         	TRISBbits.TRISB3
+    #define RADIO_SPI_SDO          	PORTBbits.RB2
+    #define RADIO_SDO_TRIS         	TRISBbits.TRISB2
+    #define RADIO_SPI_SCK          	PORTAbits.RA3
+    #define RADIO_SCK_TRIS         	TRISAbits.TRISA3
 #endif
 
 // Set which external interrupt to use
@@ -83,7 +84,7 @@
 		#error "Illegal value for USE_SPI. Must be 1 or 2 (=spi channel to use)."
 	#endif
 	// SPI settings (minus clock speed) for use with 2.4GHz RF pictail board.
-	#define SPICON1_VAL		((0b0000000100100000) | (SPI_CLKFREQ & 0x1F))
+	#define SPICON1_VAL		((0b0000000000100000) | (SPI_CLKFREQ & 0x1F))
 	#define SPISTAT_VAL		(0x8000)
 #endif
 

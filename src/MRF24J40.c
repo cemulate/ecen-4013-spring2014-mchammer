@@ -9,7 +9,7 @@
 #include <string.h>		// memset()
 #include "radiohardware.h"
 #include "MRF24J40.h"
-#include "radioAddress.h"	// addr for radio
+#include "radioaddress.h"	// addr for radio
 #include "cm_uart.h"
 
 // globals
@@ -50,46 +50,54 @@ unsigned char* readBytes(unsigned char* dstPtr, unsigned char* srcPtr, unsigned 
    And to receive, you send, wait for the byte to clock in, then read it.
 
 */
- 
+
 void spiPut(unsigned char v)		// write 1 byte to SPI
 {
-	BYTE i;
+    int i;
 
     #ifdef HARDWARE_SPI
-    	SPI_IF=0;
-    	i=SPIBUF;
-    	SPIBUF=v;
-    	while(SPI_IF==0);
-    #else
-        RADIO_SPI_SCK = 0;
 
-        for(i = 0; i < 8; i++){
-            RADIO_SPI_SDO = (v >> (7-i));
-            RADIO_SPI_SCK = 1;
-            RADIO_SPI_SCK = 0;
-        }
+    while (SPI1STATbits.SPITBF);
+    SPI1BUF = v;
+    int i = 40;
+    while (i--);
+    
+    #else
+    RADIO_SPI_SCK = 0;
+
+    for(i = 0; i < 8; i++) {
+        RADIO_SPI_SDO = (v >> (7-i));
+        RADIO_SPI_SCK = 1;
+        RADIO_SPI_SCK = 0;
+    }
     #endif
 }
 
 unsigned char spiGet(void)		// read 1 byte from SPI
 {
     #ifdef HARDWARE_SPI
-    	spiPut(0);
-    	return SPIBUF;
-	#else
-        unsigned char i;
-        unsigned char spidata = 0;
 
-        RADIO_SPI_SDO = 0;
+    while (SPI1STATbits.SPIRBF == 0);
+    unsigned char v = SPI1BUF;
+    int i = 40;
+    while (i--);
+
+    return v;
+
+    #else
+    unsigned char i;
+    unsigned char spidata = 0;
+
+    RADIO_SPI_SDO = 0;
+    RADIO_SPI_SCK = 0;
+
+    for(i = 0; i < 8; i++){
+        spidata = (spidata << 1) | RADIO_SPI_SDI;
+        RADIO_SPI_SCK = 1;
         RADIO_SPI_SCK = 0;
+    }
 
-        for(i = 0; i < 8; i++){
-            spidata = (spidata << 1) | RADIO_SPI_SDI;
-            RADIO_SPI_SCK = 1;
-            RADIO_SPI_SCK = 0;
-        }
-
-        return spidata;
+    return spidata;
     #endif
 }
 
@@ -184,8 +192,8 @@ UINT8 initMRF24J40(void)
 	do {
 		i = lowRead(READ_SOFTRST);
 		if (MRF24J40Timer>200){		// if no reset in a reasonable time (50ms)
-			return 0;		// then there is no radio hardware	
-		}	
+			return 0;		// then there is no radio hardware
+		}
 	}while((i&0x07) != (UINT8)0x00);   	// wait for hardware to clear reset bits
 
 	lowWrite(WRITE_RXFLUSH,0x01);		// flush the RX fifo, leave WAKE pin disabled
@@ -566,6 +574,7 @@ void __attribute__((interrupt,shadow,auto_psv)) _INT1Interrupt(void)
 void __attribute__((interrupt,shadow,auto_psv)) _INT2Interrupt(void)
 #endif
 {
+
 	MRF24J40_IFREG iflags;
 
 	RADIO_IF = 0;								// clear IF immediately to allow next interrupt

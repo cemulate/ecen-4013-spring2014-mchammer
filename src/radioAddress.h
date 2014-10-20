@@ -1,12 +1,16 @@
-// (c) 2010-2012 nerdfever.com
+/* 
+ * File:   radioaddress.h
+ * Author: Chase
+ *
+ * Created on October 20, 2014, 5:36 AM
+ */
 
-// Address for IEEE 802.15.4 radio
+#ifndef RADIOADDRESS_H
+#define	RADIOADDRESS_H
 
-#if !defined(_RADIOADDRESS_H_)
-#define _RADIOADDRESS_H_
-
-#define MY_LONG_ADDRESS 	(0x0000DEADBEEF0000ull)     // device MAC address (8 bytes, 64 bit)
-#define MY_SHORT_ADDRESS	(0xa500)                    // short (2 byte) 802.15.4 address
+#define MY_LONG_ADDRESS 	(0x0000111111111111)        // device MAC address (8 bytes, 64 bit)
+#define MY_SHORT_ADDRESS	(0x0A00)                    // short (2 byte) 802.15.4 address
 #define MY_PAN_ID		(0x0f00)                    // PAN identifier
 
-#endif // _RADIOADDRESS_H_
+#endif	/* RADIOADDRESS_H */
+

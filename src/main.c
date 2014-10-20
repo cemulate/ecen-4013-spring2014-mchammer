@@ -47,9 +47,12 @@
 
 #include "radiohardware.h"
 #include "MRF24J40.h"
+#include "cm_radio.h"
 
 #include "cm_accelerometer.h"
 #include "cm_soundeffects.h"
+
+#include "HammerState.h"
 
 void blinkForever();
 void blinkCommandLine();
@@ -61,23 +64,40 @@ int main(int argc, char** argv) {
 
     AD1PCFGL = 0xFFFF;          // Analog? Hell naw.
 
-    // Set up peripherals and devices
+    // Set up peripherals, devices, and state
     
     configureUART1();           // Set up UART1 module w/ baud 9600
-    
-    // Main logic loop
 
-    while (1) {
-        
-        while (!checkSpinComplete());
+    uprint("\r\n ************************ BOOT UP ************************ \r\n");
 
-        playSound(SOUND_SPIN_COMPLETE);
+    HammerState_Init();
 
-        
-        
+    char rx[2];
+
+    if (0) {
+
+        configureRadio(0x0A00, 0x0000111111111111);
+
+        while (1) {
+            uprint("Enter character to send: ");
+            uart1_gets(rx, 1);
+            radioSendMessage(rx, 0x0A00);
+        }
+
+    } else {
+
+        configureRadio(0x0A00, 0x0000111111111111);
+
+        while (1) {
+            uprint("Wating for message ...");
+
+            radioGetMessage(rx, 1);
+
+            uprint("Got message: ");
+            uprint(rx);
+        }
+
     }
-
-
 
     return (EXIT_SUCCESS);
 }
