@@ -8,7 +8,7 @@
 #ifndef CM_RADIO_H
 #define	CM_RADIO_H
 
-void configureRadio();
+int configureRadio();
 
 #endif	/* CM_RADIO_H */
 

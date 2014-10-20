@@ -57,19 +57,27 @@ void sSlave();
 int main(int argc, char** argv) {
 
     AD1PCFGL = 0xFFFF;          // Analog? Hell naw.
+
+    // Set up peripherals and devices
     
-    TRISAbits.TRISA2 = 0;       // Set pin RA2 to be digital output
-    PORTAbits.RA2 = 1;          // Set pin RA2 high
-
     configureUART1();           // Set up UART1 module w/ baud 9600
-
-    configureADC(9);
-
+    
+    // Main logic loop
+    
     while (1) {
-        uprint_dec("ADC value: ", readADCPercent());
+        
+        
+        
     }
 
+
+
     return (EXIT_SUCCESS);
+}
+
+void setupLED() {
+    TRISAbits.TRISA2 = 0;       // Set pin RA2 to be digital output
+    PORTAbits.RA2 = 1;          // Set pin RA2 high
 }
 
 void sMaster() {

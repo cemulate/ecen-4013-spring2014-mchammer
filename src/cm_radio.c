@@ -1,8 +1,10 @@
 #include <stdlib.h>
 #include <xc.h>
 
+#include "cm_uart.h"
 #include "cm_radio.h"
 
+#include "radiohardware.h"
 #include "MRF24J40.h"
 
 typedef struct {
