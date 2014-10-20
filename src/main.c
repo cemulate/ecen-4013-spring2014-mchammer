@@ -74,7 +74,11 @@ int main(int argc, char** argv) {
 
     char rx[2];
 
+    // Set to 0 when compiling for receiver
+    // Set to 1 when compiling for sender
     if (0) {
+
+        // Sender
 
         configureRadio(0x0A00, 0x0000111111111111);
 
@@ -85,6 +89,8 @@ int main(int argc, char** argv) {
         }
 
     } else {
+
+        // Receiver
 
         configureRadio(0x0A00, 0x0000111111111111);
 
