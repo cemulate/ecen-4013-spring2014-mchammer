@@ -56,7 +56,7 @@ void uart1_gets(char *buffer, int length) {
     // Make the contents of buffer a valid C string by ending
     // it with the null character
 
-    buffer[i+1] = '\0';
+    buffer[i] = 0;
 }
 
 char uart1Rx() {

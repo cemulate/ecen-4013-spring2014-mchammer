@@ -75,6 +75,13 @@ int main(int argc, char** argv) {
     // Set to 0 when compiling for receiver
     // Set to 1 when compiling for sender
 
+//    char rxbuf[2];
+//    while (1) {
+//        uprint("Enter a char");
+//        uart1_gets(rxbuf, 1);
+//        uprint(rxbuf);
+//    }
+
     configureRadio(0x0A00, 0x0000111111111111);
 
     if (1) {
@@ -101,11 +108,13 @@ void blinkOnce() {
 }
 
 void radioSenderDemo() {
+    char c;
     char rx[2];
     while (1) {
         uprint("Enter character to send: ");
         uart1_gets(rx, 1);
         radioSendMessage(rx, 0x0A00);
+        uprint("Sent message!");
     }
 }
 
