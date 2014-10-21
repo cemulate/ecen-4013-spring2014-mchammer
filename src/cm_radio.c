@@ -45,10 +45,8 @@ int configureRadio(int short_addr, long long long_addr) {
     // *********** PERIPHERAL PIN SELECT ***********
 
     RadioHW_Init();
-    uprint("RadioHW_Init done!");
 
     int radiostatus = RadioInit();
-    uprint_int("Radio status is: ", radiostatus);
     RadioInitP2P();
 
     // Set the short address, long address, and pan ID

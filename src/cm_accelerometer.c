@@ -12,3 +12,16 @@ int checkSpinComplete() {
     return 1;
 
 }
+
+int checkThrustComplete() {
+
+    uprint("Press key when thrust complete: ");
+    uart1Rx();
+
+    return 1;
+
+}
+
+void resetMotionHistory() {
+    
+}

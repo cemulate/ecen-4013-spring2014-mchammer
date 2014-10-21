@@ -52,6 +52,10 @@
 #include "cm_accelerometer.h"
 #include "cm_soundeffects.h"
 
+#include "cm_timing.h"
+
+#include "cm_lightmcu.h"
+
 #include "HammerState.h"
 
 void blinkForever();
@@ -70,24 +74,59 @@ int main(int argc, char** argv) {
 
     uprint("\r\n ************************ BOOT UP ************************ \r\n");
 
-    HammerState_Init();
+    initHammerState();
+    HammerState *gHammerState = getHammerStatePtr();
 
-    // Set to 0 when compiling for receiver
-    // Set to 1 when compiling for sender
-
-//    char rxbuf[2];
-//    while (1) {
-//        uprint("Enter a char");
-//        uart1_gets(rxbuf, 1);
-//        uprint(rxbuf);
-//    }
+    configureTimer1();
 
     configureRadio(0x0A00, 0x0000111111111111);
 
-    if (1) {
-        radioSenderDemo();
-    } else {
-        radioReceiverDemo();
+    configureLightMCU_SPI();
+
+
+    char doneString[50] = "DONE";
+    char rxbuf[50] = "DONE";
+
+    while (1) {
+
+        while (!checkSpinComplete());
+        resetMotionHistory();
+
+        playSound(SOUND_SPIN_COMPLETE);
+
+        gHammerState->chargeRate = 100 * exp(-0.023 * gHammerState->health);
+        gHammerState->charging = 1;
+
+        while (gHammerState->chargeStatus < 100) {
+            playSound(SOUND_CHARGING);
+            sendLightStateUpdate(gHammerState->health, gHammerState->chargeStatus);
+        }
+
+        playSound(SOUND_CHARGING_COMPLETE);
+
+        gHammerState->charging = 0;
+        gHammerState->chargeStatus = 0;
+
+        uprint_dec("Hammer charge status: ", gHammerState->chargeStatus);
+
+        while (!checkThrustComplete());
+        resetMotionHistory();
+
+        radioSendMessage("FIRE", 0x0A00);
+
+        gHammerState->invincible = 1;
+
+        // radioGetMessage(rxbuf, 50);
+        uprint("Press key when cloud sends packet back... ");
+        uart1Rx();
+
+        if (memcmp(rxbuf, doneString, 4) != 0) {
+            uprint("Error, invalid packet from cloud!");
+            return 1;
+        }
+
+        gHammerState->invincible = 0;
+
     }
 
     return (EXIT_SUCCESS);
@@ -108,7 +147,6 @@ void blinkOnce() {
 }
 
 void radioSenderDemo() {
-    char c;
     char rx[2];
     while (1) {
         uprint("Enter character to send: ");

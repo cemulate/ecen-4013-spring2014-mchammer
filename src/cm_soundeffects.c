@@ -8,7 +8,7 @@ int playSound(SoundEffect s) {
 
     // Nonblocking
 
-    uart1_puts("Playing some sound... ");
+    uprint("Playing some sound... ");
 
     return 1;
 

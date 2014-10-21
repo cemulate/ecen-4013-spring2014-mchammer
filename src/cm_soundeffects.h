@@ -10,7 +10,8 @@
 
 typedef enum {
     SOUND_SPIN_COMPLETE,
-    SOUND_CHARGING
+    SOUND_CHARGING,
+    SOUND_CHARGING_COMPLETE
 } SoundEffect;
 
 int playSound(SoundEffect s);

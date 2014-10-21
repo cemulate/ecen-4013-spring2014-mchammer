@@ -12,12 +12,18 @@ typedef struct {
 
     double health;
     double chargeStatus;
+    double chargeRate;
+    int charging;
+
+    int invincible;
     
 
 } HammerState;
 
 
-void HammerState_Init();
+void initHammerState();
+
+HammerState * getHammerStatePtr();
 
 #endif	/* HAMMERSTATE_H */
 

@@ -9,6 +9,9 @@
 #define	CM_ACCELEROMETER_H
 
 int checkSpinComplete();
+int checkThrustComplete();
+
+void resetMotionHistory();
 
 #endif	/* CM_ACCELEROMETER_H */
 
