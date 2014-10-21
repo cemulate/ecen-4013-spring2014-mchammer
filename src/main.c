@@ -57,6 +57,9 @@
 void blinkForever();
 void blinkCommandLine();
 
+void radioSenderDemo();
+void radioReceiverDemo();
+
 int main(int argc, char** argv) {
 
     AD1PCFGL = 0xFFFF;          // Analog? Hell naw.
@@ -68,8 +71,6 @@ int main(int argc, char** argv) {
     uprint("\r\n ************************ BOOT UP ************************ \r\n");
 
     HammerState_Init();
-
-    char rx[2];
 
     // Set to 0 when compiling for receiver
     // Set to 1 when compiling for sender
