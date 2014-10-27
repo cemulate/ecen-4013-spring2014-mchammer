@@ -11,6 +11,5 @@
 void configureTimer1();
 
 
-
 #endif	/* CM_TIMING_H */
 

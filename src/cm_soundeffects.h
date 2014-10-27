@@ -15,6 +15,11 @@ typedef enum {
 } SoundEffect;
 
 int playSound(SoundEffect s);
+/*
+	Input:	s: An enumerated integer identifying the sound
+	Output: 0 if the sound was started, 1 if a sound is already playing
+	Effect: Communicates to the sound controller to play a select sound
+*/
 
 #endif	/* CM_SOUNDEFFECTS_H */
 

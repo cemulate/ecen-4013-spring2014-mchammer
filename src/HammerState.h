@@ -25,5 +25,7 @@ void initHammerState();
 
 HammerState * getHammerStatePtr();
 
+void HammerState_doCharge(double dt);
+
 #endif	/* HAMMERSTATE_H */
 

@@ -20,6 +20,7 @@
 // Oscillator Mode (Internal Fast RC (FRC) with divide by N)
 // This is the default clock. The FRC oscillates at a nominal 7.37 MHz,
 // And "N" is by default 1, leaving our processor clocked at 7.37 MHz
+// The instruction frequency is Fosc/2 = 3.685 MHz
 
 #pragma config IESO = OFF
 // Internal External Switch Over Mode = OFF
@@ -56,6 +57,10 @@
 
 #include "cm_lightmcu.h"
 
+#include "cm_ir.h"
+
+#include "cm_delay.h"
+
 #include "HammerState.h"
 
 void blinkForever();
@@ -83,6 +88,19 @@ int main(int argc, char** argv) {
 
     configureLightMCU_SPI();
 
+    configureADC(9);
+
+    configureIRReceive();
+    //configureIRSend();        // Not functional currently
+
+
+
+    // This will continually print out health - which should be
+    // automatically responsive to IR damage/healing, if
+    // configureIRReceive() was called
+    while (1) {
+        uprint_dec("Health: ", gHammerState->health);
+    }
 
     char doneString[50] = "DONE";
     char rxbuf[50] = "DONE";
@@ -112,7 +130,7 @@ int main(int argc, char** argv) {
         while (!checkThrustComplete());
         resetMotionHistory();
 
-        radioSendMessage("FIRE", 0x0A00);
+        // radioSendMessage("FIRE", 0x0A00);
 
         gHammerState->invincible = 1;
 
@@ -138,11 +156,11 @@ void setupLED() {
 }
 
 void blinkOnce() {
-    PORTAbits.RA2 = ~PORTAbits.RA2;
-    long i = 300000;
+    PORTAbits.RA2 = 1;
+    long i = 10000;
     while (i--);
-    PORTAbits.RA2 = ~PORTAbits.RA2;
-    i = 300000;
+    PORTAbits.RA2 = 0;
+    i = 10000;
     while (i--);
 }
 
@@ -165,6 +183,8 @@ void radioReceiverDemo() {
 
         uprint("Got message: ");
         uprint(rx);
+
+        blinkOnce();
     }
 }
 

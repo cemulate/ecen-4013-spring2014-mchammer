@@ -8,7 +8,7 @@
 #ifndef CM_ADC_H
 #define	CM_ADC_H
 
-void configureADC();
+void configureADC(int analogport);
 
 unsigned int readADCRaw();
 double readADCPercent();

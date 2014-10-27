@@ -16,3 +16,7 @@ void initHammerState() {
 HammerState * getHammerStatePtr() {
     return (HammerState *)&hState;
 }
+
+void HammerState_doCharge(double dt) {
+    hState.chargeStatus += dt * hState.chargeRate;
+}

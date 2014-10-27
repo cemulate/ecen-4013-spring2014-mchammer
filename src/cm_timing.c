@@ -13,16 +13,11 @@ int countMod2;
 
 void __attribute__((__interrupt__, no_auto_psv)) _T1Interrupt(void) {
 
+    // Should be generated at 1600 Hz = (FCY / 256 / 9)
+
     // Do all stuff that happens on an interval!
     
-    HammerState *hs = getHammerStatePtr();
-
-    if (hs->charging) {
-        hs->chargeStatus += hs->chargeRate * DELTA_T;
-    }
-
-
-    
+    HammerState_doCharge(DELTA_T);
 
     IFS0bits.T1IF = 0;  // Clear Timer1 Interrupt Flag
 }
