@@ -7,7 +7,7 @@
 #include "cm_ir.h"
 #include "HammerState.h"
 
-#include "cm_delay.h"
+#include "Common.h"
 
 #define IN_RANGE(x, a, b)       ((x >= a) && (x <= b))
 
@@ -82,81 +82,95 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _IC1Interrupt(void)
 
 // **********************************************************************
 
-int toggle;
+
+#define TQ_START    10
+#define TQ_DAMAGE   20
+#define TQ_HEAL     30
+#define TQ_STOP     150
+
+
+int sendCount;
+
+int toggle, val, sent;
 
 void configureIRSend() {
 
     TRISBbits.TRISB5 = 0;
     PORTBbits.RB5 = 0;
 
-    T2CONbits.TON = 0;          // Disable Timer
-    T2CONbits.TCS = 0;          // Select internal instruction cycle clock
-    T2CONbits.TGATE = 0;        // Disable Gated Timer mode
-    T2CONbits.TCKPS = 0b01;     // Select 1:8 Prescaler
-    TMR2 = 0x00;                // Clear timer register
-    PR2 = 4;                    // Load the period value
-    IPC1bits.T2IP = 0x01;       // Set Timer2 Interrupt Priority Level
-    IFS0bits.T2IF = 0;          // Clear Timer2 Interrupt Flag
-    IEC0bits.T2IE = 1;          // Enable Timer2 interrupt
-    T2CONbits.TON = 1;          // Start Timer
+//    RPOR2bits.RP5R = 0b10010;   // Output OC1 to pin RP5
+
+//    OC1CON = 0;                 // It is a good practice to clear off the control bits initially
+//    OC1CONbits.OCTSEL = 0;      // Timer2 is source
+//
+//    OC1R = 33;
+//    OC1RS = 66;
+
+    T2CON = 0;
+    T2CONbits.TCKPS = 0b00;
+    T2CONbits.TCS = 0;
+    PR2 = 33;
+    T2CONbits.TON = 1;
+
+//    OC1CONbits.OCM = 0b000;         // Off for now
+
+//    IPC0bits.OC1IP = 1;         // Setup OC1 interrupt priority level
+//    IFS0bits.OC1IF = 0;         // Clear OC1 Interrupt Status Flag
+//    IEC0bits.OC1IE = 1;         // Enable OC1 interrupt
+
+//    IPC1bits.T2IP = 1;
+//    IFS0bits.T2IF = 0;
+//    IEC0bits.T2IE = 0;
+
+    sendCount = 0;
 
     toggle = 0;
-
 
 }
 
 void __attribute__((__interrupt__, no_auto_psv)) _T2Interrupt(void) {
 
-    // Should be generated at ~114 kHz = (FCY / 8 / 4)
-
-    IFS0bits.T2IF = 0;          // Clear Timer2 Interrupt Flag
+    IFS0bits.T2IF = 0;
 
     if (!toggle) {
-        PORTBbits.RB5 = 1;
+        PORTBbits.RB5 = val;
         toggle = 1;
     } else {
         PORTBbits.RB5 = 0;
         toggle = 0;
+        sendCount ++;
     }
 
 }
 
 void sendDamagePacket() {
 
+    INT_OFF();
 
+    sendCycles(10);
+    offCycles(140);
+    sendCycles(20);
+    offCycles(130);
+    sendCycles(20);
+    offCycles(130);
+    sendCycles(150);
+    offCycles(500);
 
-//    //send damage packets
-//    sendCycles(10);         //  send start packet
-//    offCycles(140);
-//    sendCycles(20);         //  send data packet
-//    offCycles(130);
-//    sendCycles(20);         //  send reduntant data packet
-//    offCycles(130);
-//    sendCycles(150);        //  send end packet
-//
-//    DELAY_US(2000);
+    INT_ON();
+
 }
 
 void sendHealPacket() {
-    //send damage packets
-    sendCycles(10);         //  send start packet
-    offCycles(140);
-    sendCycles(30);         //  send data packet
-    offCycles(120);
-    sendCycles(30);         //  send reduntant data packet
-    offCycles(120);
-    sendCycles(150);        //  send end packet
-
-    DELAY_US(2000);
+    
 }
 
 void pulseLED()
 {
     LED_PIN_PORT = 1;      // turn on IR
-    DELAY_US(9);
+    DELAY_US(8.82);
 
     LED_PIN_PORT = 0;     // turn off IR
-    DELAY_US(9);
+    DELAY_US(8.82);
 }
 
 void sendCycles(int n) {
@@ -166,5 +180,5 @@ void sendCycles(int n) {
 
 void offCycles(int n) {
     int i = n;
-    while (i--) DELAY_US(18);
+    while (i--) DELAY_US(8.82*2);
 }

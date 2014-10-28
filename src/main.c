@@ -59,7 +59,7 @@
 
 #include "cm_ir.h"
 
-#include "cm_delay.h"
+#include "Common.h"
 
 #include "HammerState.h"
 
@@ -83,17 +83,20 @@ int main(int argc, char** argv) {
     HammerState *gHammerState = getHammerStatePtr();
 
     configureTimer1();
-
+    
     configureRadio(0x0A00, 0x0000111111111111);
 
     configureLightMCU_SPI();
 
     configureADC(9);
+    
+    //configureIRReceive();
+    configureIRSend();
 
-    configureIRReceive();
-    //configureIRSend();        // Not functional currently
-
-
+    char out[50];
+    while (1) {
+        sendDamagePacket();
+    }
 
     // This will continually print out health - which should be
     // automatically responsive to IR damage/healing, if

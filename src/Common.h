@@ -5,8 +5,8 @@
  * Created on October 27, 2014, 4:58 AM
  */
 
-#ifndef CM_DELAY_H
-#define	CM_DELAY_H
+#ifndef COMMON_H
+#define	COMMON_H
 
 #include <libpic30.h>
 
@@ -19,5 +19,10 @@
 #define DELAY_MS(ms)  __delay32(CYCLES_PER_MS * ((unsigned long) ms));   //__delay32 is provided by the compiler, delay some # of milliseconds
 #define DELAY_US(us)  __delay32(CYCLES_PER_US * ((unsigned long) us));
 
-#endif	/* CM_DELAY_H */
+// Automatically takes care of restoring the previous values of the
+// interrupts enable registers upon re-enable
+void INT_OFF();
+void INT_ON();
+
+#endif	/* COMMON_H */
 
