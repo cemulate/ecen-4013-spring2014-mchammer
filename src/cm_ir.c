@@ -16,9 +16,6 @@ unsigned int diff;
 int inPacket;
 int dCounter, hCounter;
 
-#define LED_PIN_TRIS    TRISBbits.TRISB5
-#define LED_PIN_PORT    PORTBbits.RB5
-
 // Private functions
 void sendCycles(int n);
 void offCycles(int n);
@@ -83,11 +80,13 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _IC1Interrupt(void)
 // **********************************************************************
 
 
+#define TQ_LENGTH   150
 #define TQ_START    10
 #define TQ_DAMAGE   20
 #define TQ_HEAL     30
-#define TQ_STOP     150
 
+#define LED_PIN_TRIS    TRISBbits.TRISB5
+#define LED_PIN_PORT    PORTBbits.RB5
 
 int sendCount;
 
@@ -95,51 +94,8 @@ int toggle, val, sent;
 
 void configureIRSend() {
 
-    TRISBbits.TRISB5 = 0;
-    PORTBbits.RB5 = 0;
-
-//    RPOR2bits.RP5R = 0b10010;   // Output OC1 to pin RP5
-
-//    OC1CON = 0;                 // It is a good practice to clear off the control bits initially
-//    OC1CONbits.OCTSEL = 0;      // Timer2 is source
-//
-//    OC1R = 33;
-//    OC1RS = 66;
-
-    T2CON = 0;
-    T2CONbits.TCKPS = 0b00;
-    T2CONbits.TCS = 0;
-    PR2 = 33;
-    T2CONbits.TON = 1;
-
-//    OC1CONbits.OCM = 0b000;         // Off for now
-
-//    IPC0bits.OC1IP = 1;         // Setup OC1 interrupt priority level
-//    IFS0bits.OC1IF = 0;         // Clear OC1 Interrupt Status Flag
-//    IEC0bits.OC1IE = 1;         // Enable OC1 interrupt
-
-//    IPC1bits.T2IP = 1;
-//    IFS0bits.T2IF = 0;
-//    IEC0bits.T2IE = 0;
-
-    sendCount = 0;
-
-    toggle = 0;
-
-}
-
-void __attribute__((__interrupt__, no_auto_psv)) _T2Interrupt(void) {
-
-    IFS0bits.T2IF = 0;
-
-    if (!toggle) {
-        PORTBbits.RB5 = val;
-        toggle = 1;
-    } else {
-        PORTBbits.RB5 = 0;
-        toggle = 0;
-        sendCount ++;
-    }
+    LED_PIN_TRIS = 0;
+    LED_PIN_PORT = 0;
 
 }
 
@@ -147,16 +103,17 @@ void sendDamagePacket() {
 
     INT_OFF();
 
-    sendCycles(10);
-    offCycles(140);
-    sendCycles(20);
-    offCycles(130);
-    sendCycles(20);
-    offCycles(130);
-    sendCycles(150);
-    offCycles(500);
+    sendCycles(TQ_START);
+    offCycles(TQ_LENGTH - TQ_START);
+    sendCycles(TQ_DAMAGE);
+    offCycles(TQ_LENGTH - TQ_DAMAGE);
+    sendCycles(TQ_DAMAGE);
+    offCycles(TQ_LENGTH - TQ_DAMAGE);
+    sendCycles(TQ_LENGTH);
 
     INT_ON();
+
+    DELAY_MS(100);
 
 }
 
