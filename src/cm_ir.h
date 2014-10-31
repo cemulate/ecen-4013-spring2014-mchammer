@@ -14,9 +14,7 @@ typedef enum {
     PACKET_NONE = 3
 } MIRPPacket;
 
-void configureIRReceive();
-
-void configureIRSend();
+void initIRReceive();
 
 void sendDamagePacket();
 void sendHealPacket();

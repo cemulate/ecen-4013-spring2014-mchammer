@@ -1,7 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+
 #include <xc.h>
+#include "hardware.h"
 
 #include "cm_uart.h"
 #include "cm_radio.h"
@@ -16,7 +18,7 @@ typedef struct {
 
 static DATA_PAYLOAD txPayload;	// Structure with data to send.
 
-void RadioInitP2P(void)
+void RadioInitP2P()
 // Initialize the tx packet. This only needs to be done once if the framecontrol and dest address isn't
 // changed - as here.
 {
@@ -32,33 +34,6 @@ void RadioInitP2P(void)
 	Tx.dstAddr = RadioStatus.MyShortAddress;		// Both nodes for this demo uses the same addresses.
 	Tx.payload = (BYTE*)&txPayload;
 	Tx.payloadLength=sizeof(DATA_PAYLOAD);
-}
-
-int configureRadio(int short_addr, long long long_addr) {
-
-    // *********** PERIPHERAL PIN SELECT ***********
-    //
-    // The driver code mandates that the PPS and other settings be handled
-    // in radiohardware.h/radiohardware.c - so this is where PPS settings 
-    // should be changed if needed
-    //
-    // *********** PERIPHERAL PIN SELECT ***********
-
-    RadioHW_Init();
-
-    int radiostatus = RadioInit();
-    RadioInitP2P();
-
-    // Set the short address, long address, and pan ID
-    // (I think they can be pretty much anything except the reserved
-    // MAC addresses (0's and F's)
-    RadioSetAddress(short_addr, long_addr, 0x0F00);
-
-    // Between 11 and 26
-    RadioSetChannel(11);
-
-    return radiostatus;
-
 }
 
 void radioSendMessage(char *message, int dest_short_addr) {

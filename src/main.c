@@ -11,6 +11,7 @@
 #include <math.h>
 
 #include <xc.h>
+#include "hardware.h"
 
 // --------------------- Configuration bits ---------------------
 
@@ -44,7 +45,6 @@
 
 #include "cm_uart.h"
 #include "cm_spi.h"
-#include "cm_adc.h"
 
 #include "radiohardware.h"
 #include "MRF24J40.h"
@@ -52,8 +52,6 @@
 
 #include "cm_accelerometer.h"
 #include "cm_soundeffects.h"
-
-#include "cm_timing.h"
 
 #include "cm_lightmcu.h"
 
@@ -81,8 +79,6 @@ int main(int argc, char** argv) {
 
     initHammerState();
     HammerState *gHammerState = getHammerStatePtr();
-
-    configureTimer1();
     
     configureRadio(0x0A00, 0x0000111111111111);
 
@@ -93,7 +89,6 @@ int main(int argc, char** argv) {
     //configureIRReceive();
     configureIRSend();
 
-    char out[50];
     while (1) {
         sendDamagePacket();
     }

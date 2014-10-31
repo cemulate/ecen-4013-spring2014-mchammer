@@ -1,8 +1,3 @@
-/*
-	Hardware specific code for the MRF24J40 radio on a 2.4GHz
-	RF Pictail board on an Explorer16 board.
-*/
-
 #include "radiohardware.h"	
 
 void	RadioHW_Init()

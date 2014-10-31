@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include <xc.h>
+#include "hardware.h"
 
 #include "cm_uart.h"
 #include "cm_ir.h"
@@ -20,28 +21,10 @@ int dCounter, hCounter;
 void sendCycles(int n);
 void offCycles(int n);
 
-void configureIRReceive() {
-
-    T2CON = 0x8000;             // 1:1 prescale, Timer 2 on
-
-    TRISBbits.TRISB4 = 1;       // Set pin RB4 as input
-    RPINR7bits.IC1R = 4;        // Set input IC1 to pin RP4
-
-    IC1CONbits.ICM = 0b00;      // Disable Input Capture 1 module
-    IC1CONbits.ICTMR = 1;       // Select Timer2 as the IC1 Time base
-    IC1CONbits.ICI = 0b01;      // Interrupt on every second capture event
-    IC1CONbits.ICM = 0b001;     // Re-enable / Generate capture event every edge
-
-    // Enable Capture Interrupt And Timer2
-    IPC0bits.IC1IP = 1;         // Setup IC1 interrupt priority level
-    IFS0bits.IC1IF = 0;         // Clear IC1 Interrupt Status Flag
-    IEC0bits.IC1IE = 1;         // Enable IC1 interrupt
-
+void initIRReceive() {
     inPacket = 0;
     dCounter = 0;
     hCounter = 0;
-    
-
 }
 
 void __attribute__ ((__interrupt__,no_auto_psv)) _IC1Interrupt(void)
@@ -80,40 +63,31 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _IC1Interrupt(void)
 // **********************************************************************
 
 
-#define TQ_LENGTH   150
-#define TQ_START    10
-#define TQ_DAMAGE   20
-#define TQ_HEAL     30
-
-#define LED_PIN_TRIS    TRISBbits.TRISB5
-#define LED_PIN_PORT    PORTBbits.RB5
+#define TQ_LENGTH       150
+#define TQ_START_ON     10
+#define TQ_START_OFF    140
+#define TQ_DAMAGE_ON    20
+#define TQ_DAMAGE_OFF   130
+#define TQ_HEAL_ON      30
+#define TQ_HEAL_OFF     120
 
 int sendCount;
-
-int toggle, val, sent;
-
-void configureIRSend() {
-
-    LED_PIN_TRIS = 0;
-    LED_PIN_PORT = 0;
-
-}
 
 void sendDamagePacket() {
 
     INT_OFF();
 
-    sendCycles(TQ_START);
-    offCycles(TQ_LENGTH - TQ_START);
-    sendCycles(TQ_DAMAGE);
-    offCycles(TQ_LENGTH - TQ_DAMAGE);
-    sendCycles(TQ_DAMAGE);
-    offCycles(TQ_LENGTH - TQ_DAMAGE);
+    sendCycles(TQ_START_ON);
+    offCycles(TQ_START_OFF);
+    sendCycles(TQ_DAMAGE_ON);
+    offCycles(TQ_DAMAGE_OFF);
+    sendCycles(TQ_DAMAGE_ON);
+    offCycles(TQ_DAMAGE_OFF);
     sendCycles(TQ_LENGTH);
 
     INT_ON();
 
-    DELAY_MS(100);
+    offCycles(TQ_LENGTH*40);
 
 }
 
@@ -121,13 +95,16 @@ void sendHealPacket() {
     
 }
 
+#define PHALF   7.7         // Tuned to produce 56kHz
+#define PFULL   15.4
+
 void pulseLED()
 {
     LED_PIN_PORT = 1;      // turn on IR
-    DELAY_US(8.82);
+    DELAY_US(PHALF);
 
     LED_PIN_PORT = 0;     // turn off IR
-    DELAY_US(8.82);
+    DELAY_US(PHALF);
 }
 
 void sendCycles(int n) {
@@ -137,5 +114,5 @@ void sendCycles(int n) {
 
 void offCycles(int n) {
     int i = n;
-    while (i--) DELAY_US(8.82*2);
+    while (i--) DELAY_US(PFULL);
 }

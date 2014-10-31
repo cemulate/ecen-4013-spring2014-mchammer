@@ -8,8 +8,6 @@
 #ifndef UART_H
 #define	UART_H
 
-void configureUART1();
-
 void uart1Tx(char value);
 char uart1Rx();
 
