@@ -8,13 +8,11 @@
 #ifndef CM_SOUNDEFFECTS_H
 #define	CM_SOUNDEFFECTS_H
 
-typedef enum {
-    SOUND_SPIN_COMPLETE,
-    SOUND_CHARGING,
-    SOUND_CHARGING_COMPLETE
-} SoundEffect;
+#define SOUND_ZERO      0
+#define SOUND_ONE       1
+#define SOUND_TWO       2
 
-int playSound(SoundEffect s);
+void playSound(int sound);
 /*
 	Input:	s: An enumerated integer identifying the sound
 	Output: 0 if the sound was started, 1 if a sound is already playing

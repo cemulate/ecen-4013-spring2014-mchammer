@@ -32,5 +32,13 @@ void configureUART1();
 
 void configureTimer1_1600();
 
+#define AUDIO_CLK_TRIS      TRISBbits.TRISB0
+#define AUDIO_CLK_PORT      PORTBbits.RB0
+#define AUDIO_DATA_TRIS     TRISBbits.TRISB1
+#define AUDIO_DATA_PORT     PORTBbits.RB1
+#define AUDIO_RESET_TRIS    TRISBbits.TRISB2
+#define AUDIO_RESET_PORT    PORTBbits.RB2
+void configureAudio();
+
 #endif	/* HARDWARE_H */
 

@@ -116,3 +116,22 @@ void configureTimer1() {
     IEC0bits.T1IE = 1;          // Enable Timer1 interrupt
     T1CONbits.TON = 1;          // Start Timer
 }
+
+void configureAudio() {
+
+    AUDIO_CLK_TRIS = 0;
+    AUDIO_DATA_TRIS = 0;
+    AUDIO_RESET_TRIS = 0;
+
+    //hmmm
+    AUDIO_CLK_PORT = 1;
+    AUDIO_DATA_PORT = 1;
+
+    AUDIO_RESET_PORT = 1;
+    //__delay_ms(5);    //5ms delay
+
+    AUDIO_RESET_PORT = 0;
+    //__delay_ms(5);    //5ms delay
+
+    AUDIO_RESET_PORT = 1;
+}

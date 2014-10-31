@@ -78,27 +78,19 @@ int main(int argc, char** argv) {
     uprint("\r\n ************************ BOOT UP ************************ \r\n");
 
     initHammerState();
+    
+    //configureRadio(0x0A00, 0x0000111111111111);
+
+    while (1) {
+        playSound(SOUND_ZERO);
+    }
+
+    return (EXIT_SUCCESS);
+}
+
+void protoMain() {
+
     HammerState *gHammerState = getHammerStatePtr();
-    
-    configureRadio(0x0A00, 0x0000111111111111);
-
-    configureLightMCU_SPI();
-
-    configureADC(9);
-    
-    //configureIRReceive();
-    configureIRSend();
-
-    while (1) {
-        sendDamagePacket();
-    }
-
-    // This will continually print out health - which should be
-    // automatically responsive to IR damage/healing, if
-    // configureIRReceive() was called
-    while (1) {
-        uprint_dec("Health: ", gHammerState->health);
-    }
 
     char doneString[50] = "DONE";
     char rxbuf[50] = "DONE";
@@ -108,17 +100,17 @@ int main(int argc, char** argv) {
         while (!checkSpinComplete());
         resetMotionHistory();
 
-        playSound(SOUND_SPIN_COMPLETE);
+        playSound(SOUND_ZERO);
 
         gHammerState->chargeRate = 100 * exp(-0.023 * gHammerState->health);
         gHammerState->charging = 1;
 
         while (gHammerState->chargeStatus < 100) {
-            playSound(SOUND_CHARGING);
+            playSound(SOUND_ZERO);
             sendLightStateUpdate(gHammerState->health, gHammerState->chargeStatus);
         }
 
-        playSound(SOUND_CHARGING_COMPLETE);
+        playSound(SOUND_ZERO);
 
         gHammerState->charging = 0;
         gHammerState->chargeStatus = 0;
@@ -138,14 +130,11 @@ int main(int argc, char** argv) {
 
         if (memcmp(rxbuf, doneString, 4) != 0) {
             uprint("Error, invalid packet from cloud!");
-            return 1;
         }
 
         gHammerState->invincible = 0;
 
     }
-
-    return (EXIT_SUCCESS);
 }
 
 void setupLED() {
