@@ -100,10 +100,10 @@ void sendHealPacket() {
 
 void pulseLED()
 {
-    LED_PIN_PORT = 1;      // turn on IR
+    pLED_PIN_PORT = 1;      // turn on IR
     DELAY_US(PHALF);
 
-    LED_PIN_PORT = 0;     // turn off IR
+    pLED_PIN_PORT = 0;     // turn off IR
     DELAY_US(PHALF);
 }
 

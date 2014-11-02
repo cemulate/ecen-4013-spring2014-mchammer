@@ -14,14 +14,14 @@
 // wireless radio
 #include "radiohardware.h"
 
-void configureADC(int analogport) {
+void configureADC() {
     AD1CON1bits.AD12B = 1;              // 12-bit one-channel higher acc. mode
     AD1CON2bits.VCFG = 0;               // AVdd and AVss as + and - ref
     AD1CON3bits.ADCS = 0;               // T_AD = T_CY (sounds about right probably)
 
-    AD1PCFGL = AD1PCFGL & (~(1 << analogport));      // Disable digital function on pin 'analogport'; make it analog
+    AD1PCFGL = AD1PCFGL & (~(1 << pADC_PIN_NUM));      // Disable digital function on pin 'analogport'; make it analog
 
-    AD1CHS0bits.CH0SA = analogport;     // Sample on analog pin 'analogport'
+    AD1CHS0bits.CH0SA = pADC_PIN_NUM;     // Sample on analog pin 'analogport'
     AD1CON2bits.CHPS = 0;               // Convert "channel 0"
 
     AD1CON1bits.FORM = 0;               // Read buffer in integer form
@@ -36,8 +36,8 @@ void configureIRReceive() {
 
     T2CON = 0x8000;             // 1:1 prescale, Timer 2 on
 
-    TRISBbits.TRISB4 = 1;       // Set pin RB4 as input
-    RPINR7bits.IC1R = 4;        // Set input IC1 to pin RP4
+    pIRTX_PIN_TRIS = 1;                 // Set the chosen pin as input
+    RPINR7bits.IC1R = pIRTX_PIN_NUM;    // Set input IC1 to the chosen pin
 
     IC1CONbits.ICM = 0b00;      // Disable Input Capture 1 module
     IC1CONbits.ICTMR = 1;       // Select Timer2 as the IC1 Time base
@@ -55,8 +55,8 @@ void configureIRReceive() {
 
 void configureIRSend() {
 
-    LED_PIN_TRIS = 0;
-    LED_PIN_PORT = 0;
+    pLED_PIN_TRIS = 0;
+    pLED_PIN_PORT = 0;
 
 }
 
@@ -85,8 +85,8 @@ int configureRadio(int short_addr, long long long_addr) {
 
 void configureUART1() {
 
-    RPOR4bits.RP8R = 0b00011;   // Assign output U1TX to pin RP8
-    RPINR18bits.U1RXR = 6;      // Assign input U1RX to pin RP6
+    pUART_TX_RPOR = 0b00011;   // Assign output U1TX to pin RP8
+    RPINR18bits.U1RXR = pUART_RX_NUM;      // Assign input U1RX to pin RP6
 
 
     U1MODE = 0x00;
@@ -119,19 +119,19 @@ void configureTimer1() {
 
 void configureAudio() {
 
-    AUDIO_CLK_TRIS = 0;
-    AUDIO_DATA_TRIS = 0;
-    AUDIO_RESET_TRIS = 0;
+    pAUDIO_CLK_TRIS = 0;
+    pAUDIO_DATA_TRIS = 0;
+    pAUDIO_RESET_TRIS = 0;
 
     //hmmm
-    AUDIO_CLK_PORT = 1;
-    AUDIO_DATA_PORT = 1;
+    pAUDIO_CLK_PORT = 1;
+    pAUDIO_DATA_PORT = 1;
 
-    AUDIO_RESET_PORT = 1;
+    pAUDIO_RESET_PORT = 1;
     //__delay_ms(5);    //5ms delay
 
-    AUDIO_RESET_PORT = 0;
+    pAUDIO_RESET_PORT = 0;
     //__delay_ms(5);    //5ms delay
 
-    AUDIO_RESET_PORT = 1;
+    pAUDIO_RESET_PORT = 1;
 }
