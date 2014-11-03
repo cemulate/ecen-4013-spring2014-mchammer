@@ -8,8 +8,6 @@
 #ifndef CM_ACCELEROMETER_H
 #define	CM_ACCELEROMETER_H
 
-void configureADC(int analogport);
-
 unsigned int readADCRaw();
 
 double readADCPercent();

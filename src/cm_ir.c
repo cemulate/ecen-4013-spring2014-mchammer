@@ -6,6 +6,7 @@
 
 #include "cm_uart.h"
 #include "cm_ir.h"
+#include "cm_soundeffects.h"
 #include "HammerState.h"
 
 #include "Common.h"
@@ -52,6 +53,7 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _IC1Interrupt(void)
     if (dCounter == 2) {
         dCounter = 0;
         getHammerStatePtr()->health = getHammerStatePtr()->health - 1;
+        playSound(SOUND_ZERO);
     }
 
     if (hCounter == 2) {

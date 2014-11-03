@@ -67,25 +67,64 @@ void blinkCommandLine();
 void radioSenderDemo();
 void radioReceiverDemo();
 
+void hammerMain();
+void cloudMain();
+
+#define CLOUD   1
+
 int main(int argc, char** argv) {
 
     AD1PCFGL = 0xFFFF;          // Analog? Hell naw.
-
-    // Set up peripherals, devices, and state
-    
     configureUART1();           // Set up UART1 module w/ baud 9600
 
-    uprint("\r\n ************************ BOOT UP ************************ \r\n");
-
-    initHammerState();
-    
-    //configureRadio(0x0A00, 0x0000111111111111);
-
-    while (1) {
-        playSound(SOUND_ZERO);
+    if (CLOUD) {
+        cloudMain();
+    } else {
+        hammerMain();
     }
 
     return (EXIT_SUCCESS);
+}
+
+void hammerMain() {
+
+    uprint("\r\n ######################## BOOT UP (HAMMER) ######################## \r\n");
+
+    initHammerState();
+
+    configureADC();
+    configureTimer1();
+
+    configureAudio();
+    int sta = configureRadio(0x0A00, 0x0000111111111111);
+    uprint_int("Configured radio: ", sta);
+
+    configureIRReceive();
+
+    while (1) {
+        uprint_dec("Health: ", getHammerStatePtr()->health);
+    }
+
+    resetMotionHistory();
+    int value;
+    while(1) {
+        value = getMA();
+        if (value != -1) uprint_int("MA: ", value);
+    }
+}
+
+void cloudMain() {
+
+    uprint("\r\n ************************ BOOT UP (CLOUD) ************************ \r\n");
+
+    configureIRSend();
+
+    while (1) {
+        DELAY_MS(1500);
+        uprint("Sending damage packet...");
+        sendDamagePacket();
+    }
+    
 }
 
 void protoMain() {

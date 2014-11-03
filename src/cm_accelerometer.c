@@ -6,6 +6,8 @@
 #include "cm_uart.h"
 #include "cm_accelerometer.h"
 
+
+
 unsigned int readADCRaw() {
     AD1CON1bits.SAMP = 1;
     while (!AD1CON1bits.DONE);
@@ -16,24 +18,45 @@ double readADCPercent() {
     return 100 * (readADCRaw() / 4096.0);
 }
 
-int checkSpinComplete() {
-    
-    uprint("Press key when spin is complete: ");
-    uart1Rx();
+unsigned int nSamples;
+unsigned long long int runningSum;
 
-    return 1;
+int getMA() {
+    if (nSamples == 1024) {
+
+        int result = runningSum >> 10;
+        resetMotionHistory();
+        return result;
+
+    } else {
+        return -1;
+    }
+}
+
+void __attribute__ ((__interrupt__,no_auto_psv)) _T1Interrupt(void) {
+
+    IFS0bits.T1IF = 0;
+
+    if (nSamples < 1024) {
+        runningSum += readADCRaw();
+        nSamples ++;
+    }
+
+}
+
+int checkSpinComplete() {
+
+
 
 }
 
 int checkThrustComplete() {
 
-    uprint("Press key when thrust complete: ");
-    uart1Rx();
-
-    return 1;
+    
 
 }
 
 void resetMotionHistory() {
-    
+    nSamples = 0;
+    runningSum = 0;
 }
