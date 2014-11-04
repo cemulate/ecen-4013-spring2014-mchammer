@@ -6,7 +6,8 @@
 #include "cm_uart.h"
 #include "cm_accelerometer.h"
 
-
+#define NUM_SAMPLES         512
+#define NUM_SAMPLES_POWER   9       // 2^9 = 512
 
 unsigned int readADCRaw() {
     AD1CON1bits.SAMP = 1;
@@ -21,42 +22,55 @@ double readADCPercent() {
 unsigned int nSamples;
 unsigned long long int runningSum;
 
-int getMA() {
-    if (nSamples == 1024) {
+#define SPIN_COUNT_THRESHOLD    3
 
-        int result = runningSum >> 10;
-        resetMotionHistory();
-        return result;
+int trackingSpin;
+int spinCounter;
 
-    } else {
-        return -1;
-    }
-}
 
 void __attribute__ ((__interrupt__,no_auto_psv)) _T1Interrupt(void) {
 
     IFS0bits.T1IF = 0;
 
-    if (nSamples < 1024) {
-        runningSum += readADCRaw();
-        nSamples ++;
+    if (trackingSpin) {
+        if (nSamples < NUM_SAMPLES) {
+            runningSum += readADCRaw();
+            nSamples ++;
+        }
+
+        if (nSamples == NUM_SAMPLES) {
+
+            int result = runningSum >> NUM_SAMPLES_POWER;
+            nSamples = 0;
+            runningSum = 0;
+
+            if (result < 2500) {
+                spinCounter = 0;
+            } else {
+                spinCounter ++;
+            }
+
+            if (spinCounter == SPIN_COUNT_THRESHOLD) trackingSpin = 0;
+
+        }
     }
 
 }
 
+void startTrackingSpin() {
+    trackingSpin = 1;
+    spinCounter = 0;
+    runningSum = 0;
+    nSamples = 0;
+}
+
 int checkSpinComplete() {
 
-
+    uprint_int("spinCounter: ", spinCounter);
+    return (spinCounter == SPIN_COUNT_THRESHOLD);
 
 }
 
 int checkThrustComplete() {
 
-    
-
-}
-
-void resetMotionHistory() {
-    nSamples = 0;
-    runningSum = 0;
 }

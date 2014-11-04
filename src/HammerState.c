@@ -7,7 +7,7 @@
 static volatile HammerState hState;
 
 void initHammerState() {
-    hState.health = 0.0;
+    hState.health = 100;
     hState.chargeStatus = 0.0;
     hState.chargeRate = 20.0;        // Charge / sec
     hState.charging = 0;

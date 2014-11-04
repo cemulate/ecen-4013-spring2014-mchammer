@@ -70,7 +70,7 @@ void radioReceiverDemo();
 void hammerMain();
 void cloudMain();
 
-#define CLOUD   1
+#define CLOUD   0
 
 int main(int argc, char** argv) {
 
@@ -101,15 +101,36 @@ void hammerMain() {
 
     configureIRReceive();
 
+    configureLightMCU_SPI();
+
+//    while (1) {
+//        startTrackingSpin();
+//        while (!checkSpinComplete());
+//        uprint("You did it!");
+//        DELAY_MS(5000);
+//    }
+
+    int sound;
     while (1) {
-        uprint_dec("Health: ", getHammerStatePtr()->health);
+        uprint("Play sound...");
+        sound = uart1Rx();
+        uprint_int("Playing sound ", sound - 48);
+        playSound(sound - 48);
     }
 
-    resetMotionHistory();
-    int value;
-    while(1) {
-        value = getMA();
-        if (value != -1) uprint_int("MA: ", value);
+    unsigned char i = 0;
+    char rxnum[50];
+    unsigned char num;
+    while (1) {
+        uprint("Enter health to send");
+        uart1_gets(rxnum, 50);
+        num = (unsigned char)atoi(rxnum);
+        uprint_int("Sending ", num);
+        sendLightMCU(num);
+    }
+
+    while (1) {
+        uprint_dec("Health: ", getHammerStatePtr()->health);
     }
 }
 
@@ -127,54 +148,54 @@ void cloudMain() {
     
 }
 
-void protoMain() {
-
-    HammerState *gHammerState = getHammerStatePtr();
-
-    char doneString[50] = "DONE";
-    char rxbuf[50] = "DONE";
-
-    while (1) {
-
-        while (!checkSpinComplete());
-        resetMotionHistory();
-
-        playSound(SOUND_ZERO);
-
-        gHammerState->chargeRate = 100 * exp(-0.023 * gHammerState->health);
-        gHammerState->charging = 1;
-
-        while (gHammerState->chargeStatus < 100) {
-            playSound(SOUND_ZERO);
-            sendLightStateUpdate(gHammerState->health, gHammerState->chargeStatus);
-        }
-
-        playSound(SOUND_ZERO);
-
-        gHammerState->charging = 0;
-        gHammerState->chargeStatus = 0;
-
-        uprint_dec("Hammer charge status: ", gHammerState->chargeStatus);
-
-        while (!checkThrustComplete());
-        resetMotionHistory();
-
-        // radioSendMessage("FIRE", 0x0A00);
-
-        gHammerState->invincible = 1;
-
-        // radioGetMessage(rxbuf, 50);
-        uprint("Press key when cloud sends packet back... ");
-        uart1Rx();
-
-        if (memcmp(rxbuf, doneString, 4) != 0) {
-            uprint("Error, invalid packet from cloud!");
-        }
-
-        gHammerState->invincible = 0;
-
-    }
-}
+//void protoMain() {
+//
+//    HammerState *gHammerState = getHammerStatePtr();
+//
+//    char doneString[50] = "DONE";
+//    char rxbuf[50] = "DONE";
+//
+//    while (1) {
+//
+//        while (!checkSpinComplete());
+//        resetMotionHistory();
+//
+//        playSound(SOUND_ZERO);
+//
+//        gHammerState->chargeRate = 100 * exp(-0.023 * gHammerState->health);
+//        gHammerState->charging = 1;
+//
+//        while (gHammerState->chargeStatus < 100) {
+//            playSound(SOUND_ZERO);
+//            sendLightStateUpdate(gHammerState->health, gHammerState->chargeStatus);
+//        }
+//
+//        playSound(SOUND_ZERO);
+//
+//        gHammerState->charging = 0;
+//        gHammerState->chargeStatus = 0;
+//
+//        uprint_dec("Hammer charge status: ", gHammerState->chargeStatus);
+//
+//        while (!checkThrustComplete());
+//        resetMotionHistory();
+//
+//        // radioSendMessage("FIRE", 0x0A00);
+//
+//        gHammerState->invincible = 1;
+//
+//        // radioGetMessage(rxbuf, 50);
+//        uprint("Press key when cloud sends packet back... ");
+//        uart1Rx();
+//
+//        if (memcmp(rxbuf, doneString, 4) != 0) {
+//            uprint("Error, invalid packet from cloud!");
+//        }
+//
+//        gHammerState->invincible = 0;
+//
+//    }
+//}
 
 void setupLED() {
     TRISAbits.TRISA2 = 0;       // Set pin RA2 to be digital output

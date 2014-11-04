@@ -10,7 +10,7 @@
 
 typedef struct {
 
-    double health;
+    int health;
     double chargeStatus;
     double chargeRate;
     int charging;

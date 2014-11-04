@@ -27,6 +27,12 @@ void configureIRReceive();
 #define pLED_PIN_PORT    PORTBbits.RB5
 void configureIRSend();
 
+#define pLIGHTMCU_SDI_RPOR  RPOR0bits.RP0R
+#define pLIGHTMCU_SCK_RPOR  RPOR0bits.RP1R
+#define pLIGHTMCU_SDO_TRIS  TRISBbits.TRISB0
+#define pLIGHTMCU_SDO_PORT  PORTBbits.RB0
+#define pLIGHTMCU_SCK_TRIS  TRISBbits.TRISB1
+#define pLIGHTMCU_SCK_PORT  PORTBbits.RB1
 void configureLightMCU_SPI();
 
 // Pin defines for this are in radiohardware.h
@@ -38,12 +44,12 @@ void configureUART1();
 
 void configureTimer1_1600();
 
-#define pAUDIO_CLK_TRIS      TRISBbits.TRISB7
-#define pAUDIO_CLK_PORT      PORTBbits.RB7
-#define pAUDIO_DATA_TRIS     TRISBbits.TRISB9
-#define pAUDIO_DATA_PORT     PORTBbits.RB9
-#define pAUDIO_RESET_TRIS    TRISBbits.TRISB10
-#define pAUDIO_RESET_PORT    PORTBbits.RB10
+#define pAUDIO_CLK_TRIS      TRISAbits.TRISA0
+#define pAUDIO_CLK_PORT      PORTAbits.RA0
+#define pAUDIO_DATA_TRIS     TRISAbits.TRISA1
+#define pAUDIO_DATA_PORT     PORTAbits.RA1
+#define pAUDIO_RESET_TRIS    TRISAbits.TRISA2
+#define pAUDIO_RESET_PORT    PORTAbits.RA2
 void configureAudio();
 
 #endif	/* HARDWARE_H */
