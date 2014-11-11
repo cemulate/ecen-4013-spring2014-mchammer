@@ -41,6 +41,9 @@
 // Tell the OSC2 pin to behave as a regular digital I/O pin, instead of
 // exporting the internal clock signal. Datasheet sec 25.1
 
+#pragma config FWDTEN = OFF
+// Turn that watchdog shit the fuck off
+
 // --------------------------------------------------------------
 
 #include "cm_uart.h"
@@ -60,6 +63,8 @@
 #include "Common.h"
 
 #include "HammerState.h"
+
+#include "cm_cloudlighting.h"
 
 void blinkForever();
 void blinkCommandLine();
@@ -91,10 +96,9 @@ void hammerMain() {
     uprint("\r\n ######################## BOOT UP (HAMMER) ######################## \r\n");
 
     initHammerState();
+    HammerState *hs = getHammerStatePtr();
 
     configureADC();
-    configureTimer1();
-
     configureAudio();
     int sta = configureRadio(0x0A00, 0x0000111111111111);
     uprint_int("Configured radio: ", sta);
@@ -102,48 +106,117 @@ void hammerMain() {
     configureIRReceive();
 
     configureLightMCU_SPI();
+    configureTimer1();
 
-//    while (1) {
-//        startTrackingSpin();
-//        while (!checkSpinComplete());
-//        uprint("You did it!");
-//        DELAY_MS(5000);
-//    }
+    char sendString[2] = "x";
+    char rxbuf[50];
+    char doneString[] = "DONE";
 
-    int sound;
-    while (1) {
-        uprint("Play sound...");
-        sound = uart1Rx();
-        uprint_int("Playing sound ", sound - 48);
-        playSound(sound - 48);
-    }
-
-    unsigned char i = 0;
-    char rxnum[50];
-    unsigned char num;
-    while (1) {
-        uprint("Enter health to send");
-        uart1_gets(rxnum, 50);
-        num = (unsigned char)atoi(rxnum);
-        uprint_int("Sending ", num);
-        sendLightMCU(num);
-    }
+    playSound(HAMMER_SOUND_BOOT);
+    sendLightMCU(hs->health);
 
     while (1) {
-        uprint_dec("Health: ", getHammerStatePtr()->health);
+
+        uprint("Beginning of main loop");
+
+        uprint("Waiting for spin...");
+        startTrackingSpin();
+        while (!checkSpinComplete());
+
+        uprint("Spin complete!");
+        playSound(HAMMER_SOUND_SPINCOMPLETE);
+
+        DELAY_MS(3000);
+
+        playSound(HAMMER_SOUND_CHARGING);
+
+        sendLightMCU(0);
+        uprint("Charging ...");
+
+        hs->chargeStatus = 0;
+        hs->charging = 1;
+        while (hs->chargeStatus < 100) {
+            hs->chargeStatus ++;
+            sendLightMCU(hs->chargeStatus);
+            DELAY_MS(20);
+        }
+        hs->charging = 0;
+
+        sendLightMCU(hs->health);
+
+        // No sounds for now
+        uprint("Finished charging!");
+
+        playSound(HAMMER_SOUND_SPINCOMPLETE);
+
+        uprint("Waiting for thrust...");
+        startTrackingThrust();
+        while (!checkThrustComplete());
+
+        uprint("Thrust complete!");
+        playSound(HAMMER_SOUND_FIRE);
+
+        // Become invincible
+        disableIRReceive();
+
+        uprint("Sending radio message");
+        sendString[0] = hs->health;
+        radioSendMessage(sendString, 0x0A00);
+
+        uprint("Waiting for cloud message");
+        radioGetMessage(rxbuf, 50);
+
+        if (memcmp(rxbuf, doneString, 4) != 0) {
+            uprint("Invalid message from cloud!");
+        }
+
+        uprint("Got clousd message");
+
+        enableIRReceive();
+
     }
+
 }
 
 void cloudMain() {
 
     uprint("\r\n ************************ BOOT UP (CLOUD) ************************ \r\n");
 
+    
+
+    configureAudio();
     configureIRSend();
+    int sta = configureRadio(0x0A00, 0x0000111111111111);
+    configureCloudLighting();
+
+    char rxbuf[2];
+    int damageToSend, i;
+
+    playSound(CLOUD_SOUND_BOOT);
 
     while (1) {
-        DELAY_MS(1500);
-        uprint("Sending damage packet...");
-        sendDamagePacket();
+
+        uprint("Beginning of main loop");
+
+        uprint("Waiting for hammer message");
+        radioGetMessage(rxbuf, 1);
+
+        uprint("Got message");
+
+        playSound(CLOUD_SOUND_FIRE);
+        cloudLightingOn();
+
+        damageToSend = rxbuf[0];
+        for (i = 0; i < damageToSend; i ++) {
+            uprint("Sending damage packet");
+            sendDamagePacket();
+        }
+
+        cloudLightingOff();
+
+        uprint("Sending DONE message");
+        radioSendMessage("DONE", 0x0A00);
+
     }
     
 }
@@ -230,8 +303,6 @@ void radioReceiverDemo() {
 
         uprint("Got message: ");
         uprint(rx);
-
-        blinkOnce();
     }
 }
 

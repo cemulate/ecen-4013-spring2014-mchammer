@@ -11,5 +11,8 @@
 void sendLightMCU(unsigned char data);
 void updateLightMCU(int health, int charge);
 
+void setLightMCU_Red();
+void setLightMCU_Green();
+
 #endif	/* CM_LIGHTMCU_H */
 

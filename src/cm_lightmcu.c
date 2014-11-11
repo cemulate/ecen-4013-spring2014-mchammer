@@ -27,3 +27,11 @@ void updateLightMCU(int health, int charge) {
     sendLightMCU(charge);
 
 }
+
+void setLightMCU_Red() {
+    sendLightMCU(32);
+}
+
+void setLightMCU_Green() {
+    sendLightMCU(100);
+}

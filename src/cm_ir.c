@@ -36,13 +36,16 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _IC1Interrupt(void)
     if (!inPacket) {
         c1 = IC1BUF;
         inPacket = 1;
+        disableMotionTracking();
     } else {
         c2 = IC1BUF;
         inPacket = 0;
+        enableMotionTracking();
     }
 
     if (!inPacket) {
         diff = c2 - c1;
+        //uprint_int("diff: ", diff);
         if ((diff > 1350) && (diff < 1750)) {
             dCounter ++;
         } else if ((diff > 2000) && (diff < 2400)) {
@@ -50,16 +53,27 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _IC1Interrupt(void)
         }
     }
 
+    HammerState *hs = getHammerStatePtr();
+
     if (dCounter == 2) {
         dCounter = 0;
-        getHammerStatePtr()->health = getHammerStatePtr()->health - 1;
-        playSound(SOUND_ZERO);
+        hs->health = hs->health - 1;
+        setLightMCU_Red();
     }
 
     if (hCounter == 2) {
         hCounter = 0;
-        getHammerStatePtr()->health = getHammerStatePtr()->health + 1;
+        hs->health = hs->health + 1;
+        setLightMCU_Green();
     }
+}
+
+void disableIRReceive() {
+    IEC0bits.IC1IE = 0;
+}
+
+void enableIRReceive() {
+    IEC0bits.IC1IE = 1;
 }
 
 // **********************************************************************
@@ -89,7 +103,7 @@ void sendDamagePacket() {
 
     INT_ON();
 
-    offCycles(TQ_LENGTH*40);
+    offCycles(TQ_LENGTH*2);
 
 }
 

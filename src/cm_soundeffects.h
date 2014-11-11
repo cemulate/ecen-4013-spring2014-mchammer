@@ -8,9 +8,17 @@
 #ifndef CM_SOUNDEFFECTS_H
 #define	CM_SOUNDEFFECTS_H
 
-#define SOUND_ZERO      0
-#define SOUND_ONE       1
-#define SOUND_TWO       2
+#define HAMMER_SOUND_BOOT               0
+#define HAMMER_SOUND_SPINCOMPLETE       1
+#define HAMMER_SOUND_CHARGING           2
+#define HAMMER_SOUND_FIRE               3
+#define HAMMER_SOUND_DAMAGED            4
+#define HAMMER_SOUND_HEALED             5
+#define HAMMER_SOUND_STUNNED            6
+
+#define CLOUD_SOUND_BOOT                0
+#define CLOUD_SOUND_FIRE                1
+
 
 void playSound(int sound);
 /*

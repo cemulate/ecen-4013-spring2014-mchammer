@@ -15,7 +15,11 @@ double readADCPercent();
 void startTrackingSpin();
 int checkSpinComplete();
 
+void startTrackingThrust();
 int checkThrustComplete();
+
+void disableMotionTracking();
+void enableMotionTracking();
 
 
 #endif	/* CM_ACCELEROMETER_H */

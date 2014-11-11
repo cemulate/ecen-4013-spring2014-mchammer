@@ -64,26 +64,6 @@ void configureLightMCU_SPI() {
 
     pLIGHTMCU_SDO_TRIS = 0;
     pLIGHTMCU_SCK_TRIS = 0;
-
-//    pLIGHTMCU_SDI_RPOR = 0b00111;       // Set output SDO1 to pLIGHTMCU_SDI
-//    pLIGHTMCU_SCK_RPOR = 0b01000;       // Set output SCK1 to pLIGHTMCU_SCK
-//    TRISBbits.TRISB0 = 0;
-//    TRISBbits.TRISB1 = 0;
-//
-////    SPI1CON1bits.DISSCK = 0;            //Internal Serial Clock is Enabled
-////    SPI1CON1bits.DISSDO = 0;            //SDOx pin is controlled by the module
-////    SPI1CON1bits.MODE16 = 0;            //Communication is word-wide (16 bits)
-////    SPI1CON1bits.SMP = 0;               //Input Data is sampled at the middle of data output time
-////    SPI1CON1bits.CKE = 0;               //Serial output data changes on transition from
-////
-////    SPI1CON1bits.CKP = 0;               //Idle state for clock is a low level;
-////
-////    SPI1CON1bits.MSTEN = 1;             //Master Mode Enabled
-////    SPI1STATbits.SPIEN = 1;             //Enable SPI Module
-//
-//    SPI1CON1 = 0;
-//    SPI1CON1bits.MSTEN = 1;
-//    SPI1STATbits.SPIEN = 1;
 }
 
 int configureRadio(int short_addr, long long long_addr) {
@@ -156,4 +136,9 @@ void configureAudio() {
     //__delay_ms(5);    //5ms delay
 
     pAUDIO_RESET_PORT = 1;
+}
+
+void configureCloudLighting() {
+    pCLIGHTS_PIN_TRIS = 0;
+    pCLIGHTS_PIN_PORT = 0;
 }

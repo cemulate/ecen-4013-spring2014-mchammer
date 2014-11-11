@@ -5,6 +5,7 @@
 
 #include "cm_uart.h"
 #include "cm_accelerometer.h"
+#include "HammerState.h"
 
 #define NUM_SAMPLES         512
 #define NUM_SAMPLES_POWER   9       // 2^9 = 512
@@ -26,6 +27,9 @@ unsigned long long int runningSum;
 
 int trackingSpin;
 int spinCounter;
+
+int trackingThrust;
+int thrustComplete;
 
 
 void __attribute__ ((__interrupt__,no_auto_psv)) _T1Interrupt(void) {
@@ -53,12 +57,20 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _T1Interrupt(void) {
             if (spinCounter == SPIN_COUNT_THRESHOLD) trackingSpin = 0;
 
         }
+    } else if (trackingThrust) {
+
+        thrustComplete = (readADCRaw() < 1500);
+        if (thrustComplete) trackingThrust = 0;
+
     }
+
+    if (!getHammerStatePtr()->charging) sendLightMCU(getHammerStatePtr()->health);
 
 }
 
 void startTrackingSpin() {
     trackingSpin = 1;
+    trackingThrust = 0;
     spinCounter = 0;
     runningSum = 0;
     nSamples = 0;
@@ -66,11 +78,23 @@ void startTrackingSpin() {
 
 int checkSpinComplete() {
 
-    uprint_int("spinCounter: ", spinCounter);
     return (spinCounter == SPIN_COUNT_THRESHOLD);
 
 }
 
-int checkThrustComplete() {
+void startTrackingThrust() {
+    trackingSpin = 0;
+    trackingThrust = 1;
+}
 
+int checkThrustComplete() {
+    return thrustComplete;
+}
+
+void disableMotionTracking() {
+    IEC0bits.T1IE = 0;
+}
+
+void enableMotionTracking() {
+    IEC0bits.T1IE = 1;
 }

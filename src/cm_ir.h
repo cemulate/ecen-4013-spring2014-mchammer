@@ -19,5 +19,8 @@ void initIRReceive();
 void sendDamagePacket();
 void sendHealPacket();
 
+void disableIRReceive();
+void enableIRReceive();
+
 #endif	/* CM_IR_H */
 
