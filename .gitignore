@@ -3,5 +3,7 @@ debug/
 nbproject/
 dist/
 disassembly/
+*.X
+*.sublime*
 *.o
 Makefile
