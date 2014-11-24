@@ -75,12 +75,14 @@ void radioReceiverDemo();
 void hammerMain();
 void cloudMain();
 
-#define CLOUD   0
+#define CLOUD   1
 
 int main(int argc, char** argv) {
 
     AD1PCFGL = 0xFFFF;          // Analog? Hell naw.
     configureUART1();           // Set up UART1 module w/ baud 9600
+
+    TEST_CloudLighting();
 
     if (CLOUD) {
         cloudMain();
@@ -106,7 +108,7 @@ void hammerMain() {
     configureIRReceive();
 
     configureLightMCU_SPI();
-    configureTimer1();
+    configureTimer1_1600();
 
     char sendString[2] = "x";
     char rxbuf[50];
@@ -187,6 +189,7 @@ void cloudMain() {
     configureAudio();
     configureIRSend();
     int sta = configureRadio(0x0A00, 0x0000111111111111);
+    uprint_int("Configured radio: ", sta);
     configureCloudLighting();
 
     char rxbuf[2];
@@ -204,15 +207,12 @@ void cloudMain() {
         uprint("Got message");
 
         playSound(CLOUD_SOUND_FIRE);
-        cloudLightingOn();
 
         damageToSend = rxbuf[0];
         for (i = 0; i < damageToSend; i ++) {
             uprint("Sending damage packet");
             sendDamagePacket();
         }
-
-        cloudLightingOff();
 
         uprint("Sending DONE message");
         radioSendMessage("DONE", 0x0A00);
@@ -221,70 +221,8 @@ void cloudMain() {
     
 }
 
-//void protoMain() {
-//
-//    HammerState *gHammerState = getHammerStatePtr();
-//
-//    char doneString[50] = "DONE";
-//    char rxbuf[50] = "DONE";
-//
-//    while (1) {
-//
-//        while (!checkSpinComplete());
-//        resetMotionHistory();
-//
-//        playSound(SOUND_ZERO);
-//
-//        gHammerState->chargeRate = 100 * exp(-0.023 * gHammerState->health);
-//        gHammerState->charging = 1;
-//
-//        while (gHammerState->chargeStatus < 100) {
-//            playSound(SOUND_ZERO);
-//            sendLightStateUpdate(gHammerState->health, gHammerState->chargeStatus);
-//        }
-//
-//        playSound(SOUND_ZERO);
-//
-//        gHammerState->charging = 0;
-//        gHammerState->chargeStatus = 0;
-//
-//        uprint_dec("Hammer charge status: ", gHammerState->chargeStatus);
-//
-//        while (!checkThrustComplete());
-//        resetMotionHistory();
-//
-//        // radioSendMessage("FIRE", 0x0A00);
-//
-//        gHammerState->invincible = 1;
-//
-//        // radioGetMessage(rxbuf, 50);
-//        uprint("Press key when cloud sends packet back... ");
-//        uart1Rx();
-//
-//        if (memcmp(rxbuf, doneString, 4) != 0) {
-//            uprint("Error, invalid packet from cloud!");
-//        }
-//
-//        gHammerState->invincible = 0;
-//
-//    }
-//}
 
-void setupLED() {
-    TRISAbits.TRISA2 = 0;       // Set pin RA2 to be digital output
-    PORTAbits.RA2 = 1;          // Set pin RA2 high
-}
-
-void blinkOnce() {
-    PORTAbits.RA2 = 1;
-    long i = 10000;
-    while (i--);
-    PORTAbits.RA2 = 0;
-    i = 10000;
-    while (i--);
-}
-
-void radioSenderDemo() {
+void TEST_RadioSend() {
     char rx[2];
     while (1) {
         uprint("Enter character to send: ");
@@ -294,7 +232,7 @@ void radioSenderDemo() {
     }
 }
 
-void radioReceiverDemo() {
+void TEST_RadioReceive() {
     char rx[2];
     while (1) {
         uprint("Wating for message ...");
@@ -306,52 +244,36 @@ void radioReceiverDemo() {
     }
 }
 
-void blinkForever() {
-    long i = 0;
-    while (1) {
-        i = 300000;
-        while (i--) {
+void TEST_Audio() {
+    configureAudio();
 
-        }
-        PORTAbits.RA2 = ~PORTAbits.RA2;
-        uprint("Blink...");
+    char tx;
+    while(1) {
+        uprint("Enter number of sound to play: ");
+        tx = uart1Rx() - 48;
+        playSound((int)tx);
     }
 }
 
-void blinkCommandLine() {
+void TEST_LightMCU() {
+    configureLightMCU_SPI();
 
-    char rx;
-    char confirm_message[50];
-    int count = 0;
-    long i = 0;
+    int i = 0;
     while (1) {
-        // Set RA2 low
-        PORTAbits.RA2 = 0;
-
-        uprint("\r\n");
-        uprint("Please enter a number between 1 and 9: ");
-
-        rx = uart1Rx();
-
-        int number = (int)rx - 48;
-
-        sprintf(confirm_message, "Blinking %d times ... ", number);
-        uprint(confirm_message);
-
-        for (count = 0; count < number; count ++) {
-
-            for (i = 0; i < 30000; i ++) {
-
-            }
-
-            PORTAbits.RA2 = ~PORTAbits.RA2;
-
-            for (i = 0; i < 30000; i ++) {
-
-            }
-
-            PORTAbits.RA2 = ~PORTAbits.RA2;
-
+        for (i = 1; i <= 100; i ++) {
+            uprint_int("Sending ", i);
+            sendLightMCU(i + 100);
+            DELAY_MS(50);
         }
     }
+}
+
+void TEST_CloudLighting() {
+
+    configureCloudLighting();
+
+    while (1) {
+        TLC5940_SetGS_And_GS_PWM();
+    }
+
 }

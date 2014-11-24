@@ -8,8 +8,10 @@
 #ifndef CM_CLOUDLIGHTING_H
 #define	CM_CLOUDLIGHTING_H
 
-void cloudLightingOn();
-void cloudLightingOff();
+void cloudLED_spiSend(unsigned int);
+void sendCloudLEDState(unsigned int *p);
+
+void TLC5940_SetGS_And_GS_PWM();
 
 #endif	/* CM_CLOUDLIGHTING_H */
 

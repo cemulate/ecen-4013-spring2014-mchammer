@@ -7,6 +7,8 @@
 #include "cm_uart.h"
 #include "cm_ir.h"
 #include "cm_soundeffects.h"
+#include "cm_accelerometer.h"
+#include "cm_lightmcu.h"
 #include "HammerState.h"
 
 #include "Common.h"

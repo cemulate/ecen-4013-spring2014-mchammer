@@ -5,6 +5,7 @@
 
 #include "cm_uart.h"
 #include "cm_accelerometer.h"
+#include "cm_lightmcu.h"
 #include "HammerState.h"
 
 #define NUM_SAMPLES         512

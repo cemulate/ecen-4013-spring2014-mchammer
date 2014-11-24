@@ -103,7 +103,7 @@ void configureUART1() {
     U1STAbits.UTXEN = 1;
 }
 
-void configureTimer1() {
+void configureTimer1_1600() {
 
     // Configure Timer1 to generate an interrupt at 1600 Hz
 
@@ -139,6 +139,19 @@ void configureAudio() {
 }
 
 void configureCloudLighting() {
-    pCLIGHTS_PIN_TRIS = 0;
-    pCLIGHTS_PIN_PORT = 0;
+
+    pCLIGHTS_XLAT_TRIS = 0;
+    pCLIGHTS_SCK_TRIS = 0;
+    pCLIGHTS_SDO_TRIS = 0;
+    pCLIGHTS_BLANK_TRIS = 0;
+    pCLIGHTS_VPRG_TRIS = 0;
+    pCLIGHTS_GSCLK_TRIS = 0;
+
+    pCLIGHTS_GSCLK_PORT = 0;
+    pCLIGHTS_SCK_PORT = 0;
+    pCLIGHTS_DCPRG_PORT = 0;
+    pCLIGHTS_VPRG_PORT = 1;
+    pCLIGHTS_XLAT_PORT = 0;
+    pCLIGHTS_BLANK_PORT = 0;
+
 }

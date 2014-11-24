@@ -50,8 +50,21 @@ void configureTimer1_1600();
 #define pAUDIO_RESET_PORT    PORTAbits.RA2
 void configureAudio();
 
-#define pCLIGHTS_PIN_TRIS   TRISBbits.TRISB15
-#define pCLIGHTS_PIN_PORT   PORTBbits.RB15
+#define pCLIGHTS_XLAT_TRIS	TRISBbits.TRISB9
+#define pCLIGHTS_XLAT_PORT	PORTBbits.RB9
+#define pCLIGHTS_SCK_TRIS       TRISAbits.TRISA4
+#define pCLIGHTS_SCK_PORT       PORTAbits.RA4
+#define pCLIGHTS_SDO_TRIS       TRISBbits.TRISB0
+#define pCLIGHTS_SDO_PORT       PORTBbits.RB0
+#define pCLIGHTS_GSCLK_TRIS     TRISBbits.TRISB1
+#define pCLIGHTS_GSCLK_PORT     PORTBbits.RB1
+#define pCLIGHTS_BLANK_TRIS     TRISBbits.TRISB4
+#define pCLIGHTS_BLANK_PORT     PORTBbits.RB4
+#define pCLIGHTS_DCPRG_TRIS     TRISBbits.TRISB10
+#define pCLIGHTS_DCPRG_PORT     PORTBbits.RB10
+#define pCLIGHTS_VPRG_TRIS      TRISBbits.TRISB8
+#define pCLIGHTS_VPRG_PORT      PORTBbits.RB8
+
 void configureCloudLighting();
 
 #define pCAN_TX_NUM         9
