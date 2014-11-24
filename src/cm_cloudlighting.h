@@ -11,7 +11,7 @@
 void cloudLED_spiSend(unsigned int);
 void sendCloudLEDState(unsigned int *p);
 
-void TLC5940_SetGS_And_GS_PWM();
+void TIMER_cloudLightingRoutine();
 
 #endif	/* CM_CLOUDLIGHTING_H */
 

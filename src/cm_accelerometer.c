@@ -32,11 +32,7 @@ int spinCounter;
 int trackingThrust;
 int thrustComplete;
 
-
-void __attribute__ ((__interrupt__,no_auto_psv)) _T1Interrupt(void) {
-
-    IFS0bits.T1IF = 0;
-
+void TIMER_accelerometerRoutine() {
     if (trackingSpin) {
         if (nSamples < NUM_SAMPLES) {
             runningSum += readADCRaw();
@@ -66,7 +62,6 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _T1Interrupt(void) {
     }
 
     if (!getHammerStatePtr()->charging) sendLightMCU(getHammerStatePtr()->health);
-
 }
 
 void startTrackingSpin() {

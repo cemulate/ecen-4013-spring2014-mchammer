@@ -21,6 +21,9 @@ int checkThrustComplete();
 void disableMotionTracking();
 void enableMotionTracking();
 
+// Timer routine
+void TIMER_accelerometerRoutine();
+
 
 #endif	/* CM_ACCELEROMETER_H */
 

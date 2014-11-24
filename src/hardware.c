@@ -119,6 +119,22 @@ void configureTimer1_1600() {
     T1CONbits.TON = 1;          // Start Timer
 }
 
+void configureTimer1_fast() {
+
+    // Configure Timer1 to generate an interrupt at ~Fcy Hz
+
+    T1CONbits.TON = 0;          // Disable Timer
+    T1CONbits.TCS = 0;          // Select internal instruction cycle clock
+    T1CONbits.TGATE = 0;        // Disable Gated Timer mode
+    T1CONbits.TCKPS = 0b00;     // Select 1:1 Prescaler
+    TMR1 = 0x00;                // Clear timer register
+    PR1 = 1;                    // Load the period value
+    IPC0bits.T1IP = 0x01;       // Set Timer1 Interrupt Priority Level
+    IFS0bits.T1IF = 0;          // Clear Timer1 Interrupt Flag
+    IEC0bits.T1IE = 1;          // Enable Timer1 interrupt
+    T1CONbits.TON = 1;          // Start Timer
+}
+
 void configureAudio() {
 
     pAUDIO_CLK_TRIS = 0;

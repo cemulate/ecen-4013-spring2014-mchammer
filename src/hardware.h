@@ -41,6 +41,7 @@ int configureRadio(int short_addr, long long long_addr);
 void configureUART1();
 
 void configureTimer1_1600();
+void configureTimer1_fast();
 
 #define pAUDIO_CLK_TRIS      TRISAbits.TRISA0
 #define pAUDIO_CLK_PORT      PORTAbits.RA0

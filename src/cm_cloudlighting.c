@@ -28,40 +28,7 @@ unsigned char gsData[192] = {
 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // Channel 0
 };
 
-void cloudLED_spiSend(unsigned int data) {
-
-	int i = 0;
-    for(i = 0; i < 16; i++) {
-        pCLIGHTS_SDO_PORT = (data >> (15-i));
-        pCLIGHTS_SCK_PORT = 1;
-        pCLIGHTS_SCK_PORT = 0;
-    }
-
-}
-
-
-void sendCloudLEDState(unsigned int *p) {
-    // Takes an array of 16 ints
-
-    pCLIGHTS_XLAT_PORT = 0;
-
-    int i = 0;
-    for (i = 0; i < 16; i += 4) {
-            unsigned int a = p[i];
-            unsigned int b = p[i+1];
-            unsigned int c = p[i+2];
-            unsigned int d = p[i+3];
-            cloudLED_spiSend((a << 4) | (b >> 8));
-            cloudLED_spiSend((b << 8) | (c >> 4));
-            cloudLED_spiSend((c << 12) | d);
-    }
-
-    pCLIGHTS_XLAT_PORT = 1;
-    while (i--);
-    pCLIGHTS_XLAT_PORT = 0;
-}
-
-void TLC5940_SetGS_And_GS_PWM() {
+void TIMER_cloudLightingRoutine() {
     char firstCycleFlag = 0;
 
     if (pCLIGHTS_VPRG_PORT) {

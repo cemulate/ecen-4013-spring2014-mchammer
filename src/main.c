@@ -75,20 +75,18 @@ void radioReceiverDemo();
 void hammerMain();
 void cloudMain();
 
-#define CLOUD   1
+#define WHO     1
 
 int main(int argc, char** argv) {
 
     AD1PCFGL = 0xFFFF;          // Analog? Hell naw.
     configureUART1();           // Set up UART1 module w/ baud 9600
 
-    TEST_CloudLighting();
-
-    if (CLOUD) {
-        cloudMain();
-    } else {
-        hammerMain();
-    }
+#ifdef HAMMER
+    hammerMain();
+#elif CLOUD
+    cloudMain();
+#endif
 
     return (EXIT_SUCCESS);
 }
@@ -184,13 +182,13 @@ void cloudMain() {
 
     uprint("\r\n ************************ BOOT UP (CLOUD) ************************ \r\n");
 
-    
-
     configureAudio();
     configureIRSend();
     int sta = configureRadio(0x0A00, 0x0000111111111111);
     uprint_int("Configured radio: ", sta);
     configureCloudLighting();
+
+    configureTimer1_fast();
 
     char rxbuf[2];
     int damageToSend, i;
@@ -221,6 +219,24 @@ void cloudMain() {
     
 }
 
+void __attribute__ ((__interrupt__,no_auto_psv)) _T1Interrupt(void)
+{
+
+    IFS0bits.T1IF = 0; // Reset respective interrupt flag
+
+    // Run the timer routines for all components if they need it
+
+#ifdef HAMMER
+
+    TIMER_accelerometerRoutine();
+
+#elif CLOUD
+
+    TIMER_cloudLightingRoutine();
+
+#endif
+
+}
 
 void TEST_RadioSend() {
     char rx[2];
@@ -266,14 +282,4 @@ void TEST_LightMCU() {
             DELAY_MS(50);
         }
     }
-}
-
-void TEST_CloudLighting() {
-
-    configureCloudLighting();
-
-    while (1) {
-        TLC5940_SetGS_And_GS_PWM();
-    }
-
 }
