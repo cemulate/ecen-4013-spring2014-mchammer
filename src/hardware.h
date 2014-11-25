@@ -57,6 +57,7 @@ void configureAudio();
 #define pCLIGHTS_SCK_PORT       PORTAbits.RA4
 #define pCLIGHTS_SDO_TRIS       TRISBbits.TRISB0
 #define pCLIGHTS_SDO_PORT       PORTBbits.RB0
+#define pCLIGHTS_GSCLK_RPOR     RPOR0bits.RP1R
 #define pCLIGHTS_GSCLK_TRIS     TRISBbits.TRISB1
 #define pCLIGHTS_GSCLK_PORT     PORTBbits.RB1
 #define pCLIGHTS_BLANK_TRIS     TRISBbits.TRISB4

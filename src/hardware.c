@@ -121,14 +121,14 @@ void configureTimer1_1600() {
 
 void configureTimer1_fast() {
 
-    // Configure Timer1 to generate an interrupt at ~Fcy Hz
+    // Configure Timer1 to generate an interrupt at ~6400 Hz
 
     T1CONbits.TON = 0;          // Disable Timer
     T1CONbits.TCS = 0;          // Select internal instruction cycle clock
     T1CONbits.TGATE = 0;        // Disable Gated Timer mode
-    T1CONbits.TCKPS = 0b00;     // Select 1:1 Prescaler
+    T1CONbits.TCKPS = 0b00;     // Select 1:64 Prescaler
     TMR1 = 0x00;                // Clear timer register
-    PR1 = 1;                    // Load the period value
+    PR1 = 4100;                   // Load the period value
     IPC0bits.T1IP = 0x01;       // Set Timer1 Interrupt Priority Level
     IFS0bits.T1IF = 0;          // Clear Timer1 Interrupt Flag
     IEC0bits.T1IE = 1;          // Enable Timer1 interrupt
@@ -161,13 +161,36 @@ void configureCloudLighting() {
     pCLIGHTS_SDO_TRIS = 0;
     pCLIGHTS_BLANK_TRIS = 0;
     pCLIGHTS_VPRG_TRIS = 0;
-    pCLIGHTS_GSCLK_TRIS = 0;
 
-    pCLIGHTS_GSCLK_PORT = 0;
+    pCLIGHTS_GSCLK_RPOR = 0b10010;  // Tie output OC1 to GSCLK pin
+    //pCLIGHTS_GSCLK_TRIS = 0;
+
     pCLIGHTS_SCK_PORT = 0;
     pCLIGHTS_DCPRG_PORT = 0;
-    pCLIGHTS_VPRG_PORT = 1;
+    pCLIGHTS_VPRG_PORT = 0;
     pCLIGHTS_XLAT_PORT = 0;
     pCLIGHTS_BLANK_PORT = 0;
+
+    T3CONbits.TON = 0;          // Disable Timer
+    T3CONbits.TCKPS = 0b00;     // Select 1:1 Prescaler
+    TMR3 = 0x00;                // Clear timer register
+    PR3 = 1;                 // Load the period value
+    T3CONbits.TON = 1;          // Start Timer
+
+    T2CONbits.TON = 0;          // Disable Timer
+    T2CONbits.TCKPS = 0b00;     // 1:1
+    TMR2 = 0x00;                // Clear timer register
+    PR2 = 4100;                    // Load the period value
+    IPC1bits.T2IP = 0x01;       // Set Timer2 Interrupt Priority Level
+    IFS0bits.T2IF = 0;          // Clear Timer2 Interrupt Flag
+    IEC0bits.T2IE = 1;          // Enable Timer2 interrupt
+
+    OC1CONbits.OCM = 0b000;     // Disable Output Compare Module
+    OC1CONbits.OCTSEL = 1;      // Select Timer 3 as output compare time base
+
+    OC1RS = 1;                  // Load the Compare Register Value for falling edge gsclk output
+    OC1CONbits.OCM = 0b110;     // Select the Output Compare PWM mode
+
+    T2CONbits.TON = 1;          // Start Timer
 
 }

@@ -186,9 +186,13 @@ void cloudMain() {
     configureIRSend();
     int sta = configureRadio(0x0A00, 0x0000111111111111);
     uprint_int("Configured radio: ", sta);
-    configureCloudLighting();
 
-    configureTimer1_fast();
+    configureCloudLighting();
+    while (1) {
+        uprint("update on key press");
+        uart1Rx();
+        cloudLightingUpdate();
+    }
 
     char rxbuf[2];
     int damageToSend, i;
@@ -217,25 +221,6 @@ void cloudMain() {
 
     }
     
-}
-
-void __attribute__ ((__interrupt__,no_auto_psv)) _T1Interrupt(void)
-{
-
-    IFS0bits.T1IF = 0; // Reset respective interrupt flag
-
-    // Run the timer routines for all components if they need it
-
-#ifdef HAMMER
-
-    TIMER_accelerometerRoutine();
-
-#elif CLOUD
-
-    TIMER_cloudLightingRoutine();
-
-#endif
-
 }
 
 void TEST_RadioSend() {

@@ -32,7 +32,7 @@ int spinCounter;
 int trackingThrust;
 int thrustComplete;
 
-void TIMER_accelerometerRoutine() {
+void __attribute__ ((__interrupt__,no_auto_psv)) _T1Interrupt(void) {
     if (trackingSpin) {
         if (nSamples < NUM_SAMPLES) {
             runningSum += readADCRaw();

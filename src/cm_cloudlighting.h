@@ -11,7 +11,7 @@
 void cloudLED_spiSend(unsigned int);
 void sendCloudLEDState(unsigned int *p);
 
-void TIMER_cloudLightingRoutine();
+void cloudLightingUpdate();
 
 #endif	/* CM_CLOUDLIGHTING_H */
 
