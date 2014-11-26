@@ -16,6 +16,7 @@ void uart1_gets(char *buffer, int length);
 
 void uprint(char *message);
 void uprint_int(char *message, int value);
+void uprint_uint(char *message, unsigned int value);
 void uprint_dec(char *message, double value);
 
 #endif	/* UART_H */

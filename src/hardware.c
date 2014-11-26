@@ -14,7 +14,8 @@
 // wireless radio
 #include "radiohardware.h"
 
-void configureADC() {
+void configureAccelerometer() {
+
     AD1CON1bits.AD12B = 1;              // 12-bit one-channel higher acc. mode
     AD1CON2bits.VCFG = 0;               // AVdd and AVss as + and - ref
     AD1CON3bits.ADCS = 0;               // T_AD = T_CY (sounds about right probably)
@@ -30,19 +31,65 @@ void configureADC() {
     AD1CON1bits.SSRC = 0b111;           // Auto convert (conversion is ended when the module decides)
 
     AD1CON1bits.ADON = 1;               // Enable module
+
+    configureTimer1_1600();
+
+}
+
+void configureTimer1_1600() {
+    T1CONbits.TON = 0;          // Disable Timer
+    T1CONbits.TCS = 0;          // Select internal instruction cycle clock
+    T1CONbits.TGATE = 0;        // Disable Gated Timer mode
+    T1CONbits.TCKPS = 0b11;     // Select 1:256 Prescaler
+    TMR1 = 0x00;                // Clear timer register
+    PR1 = 9;                    // Load the period value
+    IPC0bits.T1IP = 0x01;       // Set Timer1 Interrupt Priority Level
+    IFS0bits.T1IF = 0;          // Clear Timer1 Interrupt Flag
+    IEC0bits.T1IE = 1;          // Enable Timer1 interrupt
+    T1CONbits.TON = 1;          // Start Timer
+}
+
+void configureTimer1_60() {
+    T1CONbits.TON = 0;          // Disable Timer
+    T1CONbits.TCS = 0;          // Select internal instruction cycle clock
+    T1CONbits.TGATE = 0;        // Disable Gated Timer mode
+    T1CONbits.TCKPS = 0b11;     // Select 1:256 Prescaler
+    TMR1 = 0x00;                // Clear timer register
+    PR1 = 256;                    // Load the period value
+    IPC0bits.T1IP = 0x01;       // Set Timer1 Interrupt Priority Level
+    IFS0bits.T1IF = 0;          // Clear Timer1 Interrupt Flag
+    IEC0bits.T1IE = 1;          // Enable Timer1 interrupt
+    T1CONbits.TON = 1;          // Start Timer
+}
+
+void configureTimer2_60() {
+    T2CONbits.TON = 0;          // Disable Timer
+    T2CONbits.TCS = 0;          // Select internal instruction cycle clock
+    T2CONbits.TGATE = 0;        // Disable Gated Timer mode
+    T2CONbits.TCKPS = 0b11;     // Select 1:256 Prescaler
+    TMR2 = 0x00;                // Clear timer register
+    PR2 = 256;                    // Load the period value
+    IPC1bits.T2IP = 0x01;       // Set Timer1 Interrupt Priority Level
+    IFS0bits.T2IF = 0;          // Clear Timer1 Interrupt Flag
+    IEC0bits.T2IE = 1;          // Enable Timer1 interrupt
+    T2CONbits.TON = 1;          // Start Timer
 }
 
 void configureIRReceive() {
 
-    T2CON = 0x8000;             // 1:1 prescale, Timer 2 on
+    T2CONbits.TON = 0;          // Disable Timer
+    T2CONbits.TCKPS = 0b00;     // Select 1:1 Prescaler
+    TMR2 = 0x00;                // Clear timer register
+    T2CONbits.TON = 1;          // Start Timer
 
-    pIRTX_PIN_TRIS = 1;                 // Set the chosen pin as input
-    RPINR7bits.IC1R = pIRTX_PIN_NUM;    // Set input IC1 to the chosen pin
+    pIRRX_PIN_TRIS = 1;                 // Set the chosen pin as input
+    RPINR7bits.IC1R = pIRRX_PIN_NUM;    // Set input IC1 to the chosen pin
 
     IC1CONbits.ICM = 0b00;      // Disable Input Capture 1 module
     IC1CONbits.ICTMR = 1;       // Select Timer2 as the IC1 Time base
-    IC1CONbits.ICI = 0b01;      // Interrupt on every second capture event
-    IC1CONbits.ICM = 0b001;     // Re-enable / Generate capture event every edge
+    IC1CONbits.ICI = 0b00;      // Interrupt on every capture event
+    //IC1CONbits.ICM = 0b001;     // Re-enable / Generate capture event every edge
+    IC1CONbits.ICM = 0b010;     // Every falling edge
 
     // Enable Capture Interrupt And Timer2
     IPC0bits.IC1IP = 1;         // Setup IC1 interrupt priority level
@@ -57,6 +104,16 @@ void configureIRSend() {
 
     pLED_PIN_TRIS = 0;
     pLED_PIN_PORT = 0;
+
+//    T4CONbits.TON = 0;          // Disable Timer
+//    T4CONbits.TCKPS = 0b00;     // Select 1:1 Prescaler
+//    TMR4 = 0x00;                // Clear timer register
+//    PR4 = 33;                 // Load the period value
+//    IPC6bits.T4IP = 0x01;       // Set Timer3 Interrupt Priority Level
+//    IFS1bits.T4IF = 0;          // Clear Timer3 Interrupt Flag
+//    IEC1bits.T4IE = 0;          // Don't Enable Timer3 interrupt yet
+//    T4CONbits.TON = 1;          // Start Timer
+
 
 }
 
@@ -101,38 +158,6 @@ void configureUART1() {
 
     U1MODEbits.UARTEN = 1;
     U1STAbits.UTXEN = 1;
-}
-
-void configureTimer1_1600() {
-
-    // Configure Timer1 to generate an interrupt at 1600 Hz
-
-    T1CONbits.TON = 0;          // Disable Timer
-    T1CONbits.TCS = 0;          // Select internal instruction cycle clock
-    T1CONbits.TGATE = 0;        // Disable Gated Timer mode
-    T1CONbits.TCKPS = 0b11;     // Select 1:256 Prescaler
-    TMR1 = 0x00;                // Clear timer register
-    PR1 = 9;                    // Load the period value
-    IPC0bits.T1IP = 0x01;       // Set Timer1 Interrupt Priority Level
-    IFS0bits.T1IF = 0;          // Clear Timer1 Interrupt Flag
-    IEC0bits.T1IE = 1;          // Enable Timer1 interrupt
-    T1CONbits.TON = 1;          // Start Timer
-}
-
-void configureTimer1_fast() {
-
-    // Configure Timer1 to generate an interrupt at ~6400 Hz
-
-    T1CONbits.TON = 0;          // Disable Timer
-    T1CONbits.TCS = 0;          // Select internal instruction cycle clock
-    T1CONbits.TGATE = 0;        // Disable Gated Timer mode
-    T1CONbits.TCKPS = 0b00;     // Select 1:64 Prescaler
-    TMR1 = 0x00;                // Clear timer register
-    PR1 = 4100;                   // Load the period value
-    IPC0bits.T1IP = 0x01;       // Set Timer1 Interrupt Priority Level
-    IFS0bits.T1IF = 0;          // Clear Timer1 Interrupt Flag
-    IEC0bits.T1IE = 1;          // Enable Timer1 interrupt
-    T1CONbits.TON = 1;          // Start Timer
 }
 
 void configureAudio() {
@@ -192,5 +217,7 @@ void configureCloudLighting() {
     OC1CONbits.OCM = 0b110;     // Select the Output Compare PWM mode
 
     T2CONbits.TON = 1;          // Start Timer
+
+    configureTimer1_60();
 
 }

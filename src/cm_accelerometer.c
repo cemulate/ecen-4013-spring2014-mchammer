@@ -32,7 +32,15 @@ int spinCounter;
 int trackingThrust;
 int thrustComplete;
 
+// We have to wrap this with #ifdef HAMMER, because the cloud
+// Defines a T1Interrupt for its use, and even though we're not using it,
+// the compiler would complain about re-definition
+#ifdef HAMMER
+
 void __attribute__ ((__interrupt__,no_auto_psv)) _T1Interrupt(void) {
+
+    IFS0bits.T1IF = 0;
+
     if (trackingSpin) {
         if (nSamples < NUM_SAMPLES) {
             runningSum += readADCRaw();
@@ -63,6 +71,8 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _T1Interrupt(void) {
 
     if (!getHammerStatePtr()->charging) sendLightMCU(getHammerStatePtr()->health);
 }
+
+#endif
 
 void startTrackingSpin() {
     trackingSpin = 1;

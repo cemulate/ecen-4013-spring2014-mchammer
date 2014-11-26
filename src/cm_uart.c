@@ -57,6 +57,15 @@ void uprint_int(char *message, int value) {
 
 }
 
+void uprint_uint(char *message, unsigned int value) {
+
+    int size = strlen(message);
+    char buf[size + 10];
+    sprintf(buf, "%s%u\r\n", message, value);
+    uprint(buf);
+
+}
+
 void uprint_dec(char *message, double value) {
 
     int size = strlen(message);

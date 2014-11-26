@@ -17,14 +17,19 @@
 #include "radiohardware.h"
 
 #define pADC_PIN_NUM    9
-void configureADC();
+//      Uses modules:   Timer 1
+void configureAccelerometer();
 
-#define pIRTX_PIN_NUM   4
-#define pIRTX_PIN_TRIS  TRISBbits.TRISB4
+void configureTimer1_1600();
+
+#define pIRRX_PIN_NUM   4
+#define pIRRX_PIN_TRIS  TRISBbits.TRISB4
+#define pIRRX_PIN_PORT  PORTBbits.RB4
+//      Uses modules:   Input Capture 1, Timer 2
 void configureIRReceive();
 
-#define pLED_PIN_TRIS    TRISBbits.TRISB5
-#define pLED_PIN_PORT    PORTBbits.RB5
+#define pLED_PIN_TRIS    TRISBbits.TRISB15
+#define pLED_PIN_PORT    PORTBbits.RB15
 void configureIRSend();
 
 #define pLIGHTMCU_SCK_TRIS  TRISAbits.TRISA4
@@ -41,7 +46,7 @@ int configureRadio(int short_addr, long long long_addr);
 void configureUART1();
 
 void configureTimer1_1600();
-void configureTimer1_fast();
+void configureTimer1_60();
 
 #define pAUDIO_CLK_TRIS      TRISAbits.TRISA0
 #define pAUDIO_CLK_PORT      PORTAbits.RA0
@@ -66,7 +71,7 @@ void configureAudio();
 #define pCLIGHTS_DCPRG_PORT     PORTBbits.RB10
 #define pCLIGHTS_VPRG_TRIS      TRISBbits.TRISB8
 #define pCLIGHTS_VPRG_PORT      PORTBbits.RB8
-
+//      Uses Modules:           Timer 1, Timer 2, Timer 3, Output Compare 1
 void configureCloudLighting();
 
 #define pCAN_TX_NUM         9

@@ -98,22 +98,24 @@ void hammerMain() {
     initHammerState();
     HammerState *hs = getHammerStatePtr();
 
-    configureADC();
+    //configureAccelerometer();
     configureAudio();
     int sta = configureRadio(0x0A00, 0x0000111111111111);
     uprint_int("Configured radio: ", sta);
 
     configureIRReceive();
 
-    configureLightMCU_SPI();
-    configureTimer1_1600();
+    //configureLightMCU_SPI();
 
     char sendString[2] = "x";
     char rxbuf[50];
     char doneString[] = "DONE";
 
     playSound(HAMMER_SOUND_BOOT);
-    sendLightMCU(hs->health);
+
+    while (1) {
+        uprint_int("Hammer health: ", hs->health);
+    }
 
     while (1) {
 
@@ -130,19 +132,15 @@ void hammerMain() {
 
         playSound(HAMMER_SOUND_CHARGING);
 
-        sendLightMCU(0);
         uprint("Charging ...");
 
         hs->chargeStatus = 0;
         hs->charging = 1;
         while (hs->chargeStatus < 100) {
             hs->chargeStatus ++;
-            sendLightMCU(hs->chargeStatus);
             DELAY_MS(20);
         }
         hs->charging = 0;
-
-        sendLightMCU(hs->health);
 
         // No sounds for now
         uprint("Finished charging!");
@@ -187,17 +185,18 @@ void cloudMain() {
     int sta = configureRadio(0x0A00, 0x0000111111111111);
     uprint_int("Configured radio: ", sta);
 
-    configureCloudLighting();
-    while (1) {
-        uprint("update on key press");
-        uart1Rx();
-        cloudLightingUpdate();
-    }
-
     char rxbuf[2];
     int damageToSend, i;
 
+    configureCloudLighting();
+    cloudLightingSetMode(ALGM_BLINK);
+
     playSound(CLOUD_SOUND_BOOT);
+
+    while(1) {
+        sendDamagePacket();
+        DELAY_MS(10);
+    }
 
     while (1) {
 
@@ -266,5 +265,22 @@ void TEST_LightMCU() {
             sendLightMCU(i + 100);
             DELAY_MS(50);
         }
+    }
+}
+
+void TEST_CloudLighting() {
+    configureCloudLighting();
+    cloudLightingSetMode(ALGM_BLINK);
+    uprint("Should be blinking...");
+}
+
+void TEST_IRReceive() {
+    configureIRReceive();
+    
+}
+
+void TEST_IRSend() {
+    while (1) {
+        sendDamagePacket();
     }
 }

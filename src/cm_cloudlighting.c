@@ -8,25 +8,27 @@
 
 #include "Common.h"
 
-unsigned char gsData[192] = {
-// MSB LSB
-0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Channel 15
-0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Channel 14
-0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Channel 13
-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Channel 12
-0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Channel 11
-0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Channel 10
-0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, // Channel 9
-0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, // Channel 8
-0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, // Channel 7
-0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, // Channel 6
-0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, // Channel 5
-0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, // Channel 4
-0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, // Channel 3
-0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, // Channel 2
-0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, // Channel 1
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // Channel 0
-};
+#include "cm_cloudlighting.h"
+
+unsigned int display[16];
+
+int lightmode = 0;
+
+void cloudLightingSetMode(int algm) {
+    lightmode = algm;
+}
+
+
+void cloudLightingSet(unsigned int num, unsigned int value) {
+    display[num] = value;
+}
+
+void cloudLightingSetAll(unsigned int value) {
+    int i = 0;
+    for (i = 0; i < 16; i ++) {
+        display[i] = value;
+    }
+}
 
 unsigned int gscount = 0;
 
@@ -35,38 +37,17 @@ void cloudLightingUpdate() {
     IEC0bits.T2IE = 0;
     pCLIGHTS_BLANK_PORT = 1;
 
-    char firstCycleFlag = 0;
-
-    if (pCLIGHTS_VPRG_PORT) {
-        pCLIGHTS_VPRG_PORT = 0;
-        firstCycleFlag = 1;
-    }
-
-    unsigned int gsclk_count = 0;
-    unsigned char data_count = 0;
-
-    while (1) {
-        if (gsclk_count > 4095) {
-            pCLIGHTS_XLAT_PORT = 1;
-            pCLIGHTS_XLAT_PORT = 0;
-            if (firstCycleFlag) {
-                pCLIGHTS_SCK_PORT = 1;
-                pCLIGHTS_SCK_PORT = 0;
-                firstCycleFlag = 0;
-            }
-            break;
-        } else {
-            if (!(data_count > (192 - 1))) {
-                pCLIGHTS_SDO_PORT = gsData[data_count];
-                pCLIGHTS_SCK_PORT = 1;
-                pCLIGHTS_SCK_PORT = 0;
-                data_count ++;
-            }
+    int i = 0, j = 0;
+    for (i = 0; i < 16; i ++) {
+        for (j = 11; j >= 0; j --) {
+            pCLIGHTS_SDO_PORT = (display[i] >> j) & 0x01;
+            pCLIGHTS_SCK_PORT = 1;
+            pCLIGHTS_SCK_PORT = 0;
         }
-//        pCLIGHTS_GSCLK_PORT = 1;
-//        pCLIGHTS_GSCLK_PORT = 0;
-        gsclk_count ++;
     }
+
+    pCLIGHTS_XLAT_PORT = 1;
+    pCLIGHTS_XLAT_PORT = 0;
 
     pCLIGHTS_BLANK_PORT = 0;
     TMR2 = 0;
@@ -74,45 +55,59 @@ void cloudLightingUpdate() {
     IEC0bits.T2IE = 1;
 }
 
+// We have to wrap this with #ifdef cloud, because the cloud defines a
+// T2Interrupt for its use, and even though we're not using it,
+// the compiler would complain about re-definition
+#ifdef CLOUD
+
 void __attribute__ ((__interrupt__,no_auto_psv)) _T2Interrupt(void) {
     IFS0bits.T2IF = 0;
     pCLIGHTS_BLANK_PORT = 1;
     pCLIGHTS_BLANK_PORT = 0;
 }
 
-//void cloudLightingUpdate() {
-//    char firstCycleFlag = 0;
-//
-//    if (pCLIGHTS_VPRG_PORT) {
-//        pCLIGHTS_VPRG_PORT = 0;
-//        firstCycleFlag = 1;
-//    }
-//
-//    unsigned int gsclk_count = 0;
-//    unsigned char data_count = 0;
-//
-//    while (1) {
-//        pCLIGHTS_BLANK_PORT = 0;
-//        if (gsclk_count > 4095) {
-//            pCLIGHTS_BLANK_PORT = 1;
-//            pCLIGHTS_XLAT_PORT = 1;
-//            pCLIGHTS_XLAT_PORT = 0;
-//            if (firstCycleFlag) {
-//                pCLIGHTS_SCK_PORT = 1;
-//                pCLIGHTS_SCK_PORT = 0;
-//                firstCycleFlag = 0;
-//            }
-//            break;
-//        } else {
-//            if (!(data_count > (192 - 1))) {
-//                pCLIGHTS_SDO_PORT = gsData[data_count];
-//                pCLIGHTS_SCK_PORT = 1;
-//                pCLIGHTS_SCK_PORT = 0;
-//                data_count ++;
-//            }
-//        }
-//        pCLIGHTS_GSCLK_PORT = 1;
-//        pCLIGHTS_GSCLK_PORT = 0;
-//        gsclk_count ++;
-//    }
-//}
+#endif
+
+unsigned int blink_timer = 0;        
+unsigned int blink_timer_max = 30;   // Run at ~60Hz/30 = 2Hz
+unsigned int blink_vals[4] = {4, 40, 400, 4000};
+unsigned int blink_counter = 0;
+void stepALGM_blink() {
+
+    if (((blink_timer ++) % blink_timer_max) != 0) return;
+
+    int i = 0;
+    for (i = 0; i < 16; i ++) {
+        cloudLightingSet(i, blink_vals[(i + blink_counter) % 4]);
+    }
+
+    blink_counter = (blink_counter + 1) % 4;
+
+    cloudLightingUpdate();
+
+}
+
+// We have to wrap this with #ifdef cloud, because the accelerometer module
+// Defines a T1Interrupt for the Hammer, and even though we're not using it,
+// the compiler would complain about re-definition
+#ifdef CLOUD
+
+// This is called at around 60 Hz. Individual algorithms can define their
+// own time steps to run at "lower resolution"
+void __attribute__ ((__interrupt__,no_auto_psv)) _T1Interrupt(void) {
+
+    IFS0bits.T1IF = 0;
+
+    switch (lightmode) {
+        case ALGM_OFF:
+            cloudLightingSetAll(0);
+            cloudLightingUpdate();
+            break;
+        case ALGM_BLINK:
+            stepALGM_blink();
+            break;
+    }
+
+}
+
+#endif
