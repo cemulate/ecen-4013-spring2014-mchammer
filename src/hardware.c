@@ -166,17 +166,6 @@ void configureAudio() {
     pAUDIO_DATA_TRIS = 0;
     pAUDIO_RESET_TRIS = 0;
 
-    //hmmm
-    pAUDIO_CLK_PORT = 1;
-    pAUDIO_DATA_PORT = 1;
-
-    pAUDIO_RESET_PORT = 1;
-    //__delay_ms(5);    //5ms delay
-
-    pAUDIO_RESET_PORT = 0;
-    //__delay_ms(5);    //5ms delay
-
-    pAUDIO_RESET_PORT = 1;
 }
 
 void configureCloudLighting() {

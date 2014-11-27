@@ -98,25 +98,24 @@ void hammerMain() {
     initHammerState();
     HammerState *hs = getHammerStatePtr();
 
-    //configureAccelerometer();
+    configureAccelerometer();
+
     configureAudio();
+    audioReset();
+
     int sta = configureRadio(0x0A00, 0x0000111111111111);
     uprint_int("Configured radio: ", sta);
 
     configureIRReceive();
 
-    //configureLightMCU_SPI();
+    configureLightMCU_SPI();
 
     char sendString[2] = "x";
     char rxbuf[50];
     char doneString[] = "DONE";
 
     playSound(HAMMER_SOUND_BOOT);
-
-    while (1) {
-        uprint_int("Hammer health: ", hs->health);
-    }
-
+    
     while (1) {
 
         uprint("Beginning of main loop");
@@ -128,7 +127,7 @@ void hammerMain() {
         uprint("Spin complete!");
         playSound(HAMMER_SOUND_SPINCOMPLETE);
 
-        DELAY_MS(3000);
+        DELAY_MS(1500);
 
         playSound(HAMMER_SOUND_CHARGING);
 
@@ -181,6 +180,8 @@ void cloudMain() {
     uprint("\r\n ************************ BOOT UP (CLOUD) ************************ \r\n");
 
     configureAudio();
+    audioReset();
+    
     configureIRSend();
     int sta = configureRadio(0x0A00, 0x0000111111111111);
     uprint_int("Configured radio: ", sta);
@@ -189,18 +190,13 @@ void cloudMain() {
     int damageToSend, i;
 
     configureCloudLighting();
-    cloudLightingSetMode(ALGM_BLINK);
 
     playSound(CLOUD_SOUND_BOOT);
-
-    while(1) {
-        sendDamagePacket();
-        DELAY_MS(10);
-    }
 
     while (1) {
 
         uprint("Beginning of main loop");
+        cloudLightingSetMode(ALGM_BLINK);
 
         uprint("Waiting for hammer message");
         radioGetMessage(rxbuf, 1);
@@ -209,10 +205,21 @@ void cloudMain() {
 
         playSound(CLOUD_SOUND_FIRE);
 
+        // Enter manual lighting mode
+        cloudLightingSetMode(ALGM_OFF);
+        cloudLightingSetAll(BRIGHTNESS_MAX);
+        cloudLightingUpdate();
+
         damageToSend = rxbuf[0];
         for (i = 0; i < damageToSend; i ++) {
             uprint("Sending damage packet");
             sendDamagePacket();
+            if ((i % 10) == 0) {
+                cloudLightingSetAll(BRIGHTNESS_MAX);
+            } else if ((i % 5) == 0) {
+                cloudLightingSetAll(50);
+            }
+            cloudLightingUpdate();
         }
 
         uprint("Sending DONE message");
@@ -245,8 +252,6 @@ void TEST_RadioReceive() {
 }
 
 void TEST_Audio() {
-    configureAudio();
-
     char tx;
     while(1) {
         uprint("Enter number of sound to play: ");

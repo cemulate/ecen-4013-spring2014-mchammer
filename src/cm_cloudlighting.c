@@ -100,8 +100,7 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _T1Interrupt(void) {
 
     switch (lightmode) {
         case ALGM_OFF:
-            cloudLightingSetAll(0);
-            cloudLightingUpdate();
+            // No active algorithm. Assume user is updating manually
             break;
         case ALGM_BLINK:
             stepALGM_blink();

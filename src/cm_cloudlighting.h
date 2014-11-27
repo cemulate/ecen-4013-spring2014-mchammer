@@ -8,9 +8,9 @@
 #ifndef CM_CLOUDLIGHTING_H
 #define	CM_CLOUDLIGHTING_H
 
-#define BRIGHTNESS_MAX      4095;
-#define BRIGHTNESS_OFF      0;
-#define BRIGHTNESS_HALF     2048;
+#define BRIGHTNESS_MAX      4095
+#define BRIGHTNESS_OFF      0
+#define BRIGHTNESS_HALF     2048
 
 #define ALGM_OFF    0
 #define ALGM_BLINK  1

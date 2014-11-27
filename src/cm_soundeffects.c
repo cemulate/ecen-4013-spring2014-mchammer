@@ -7,6 +7,34 @@
 #include "cm_uart.h"
 #include "cm_soundeffects.h"
 
+void audioReset() {
+
+//    pAUDIO_CLK_PORT = 0;
+//    pAUDIO_RESET_PORT = 1;
+//    pAUDIO_RESET_PORT = 0;
+//
+//    DELAY_MS(5);
+//
+//    pAUDIO_RESET_PORT = 1;
+//    pAUDIO_CLK_PORT = 1;
+//
+//    DELAY_MS(300);
+
+    //hmmm
+    pAUDIO_CLK_PORT = 1;
+    pAUDIO_DATA_PORT = 1;
+
+    pAUDIO_RESET_PORT = 1;
+    //__delay_ms(5);    //5ms delay
+
+    pAUDIO_RESET_PORT = 0;
+    //__delay_ms(5);    //5ms delay
+
+    pAUDIO_RESET_PORT = 1;
+
+    DELAY_MS(500);
+}
+
 void playSound(int sound) {
 
     int i;

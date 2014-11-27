@@ -45,12 +45,14 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _IC1Interrupt(void)
         dCounter ++;
         if (dCounter == 2) {
             hs->health = hs->health - 1;
+            playSound(HAMMER_SOUND_DAMAGED);
             dCounter = 0;
         }
     } else if ((diff > 2000) && (diff < 2400)) {
         hCounter ++;
         if (hCounter == 2) {
             hs->health = hs->health + 1;
+            playSound(HAMMER_SOUND_HEALED);
             hCounter = 0;
         }
     } else {

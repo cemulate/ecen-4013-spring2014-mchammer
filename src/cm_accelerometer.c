@@ -64,12 +64,10 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _T1Interrupt(void) {
         }
     } else if (trackingThrust) {
 
-        thrustComplete = (readADCRaw() < 1500);
+        thrustComplete = (readADCRaw() > 2000);
         if (thrustComplete) trackingThrust = 0;
 
     }
-
-    if (!getHammerStatePtr()->charging) sendLightMCU(getHammerStatePtr()->health);
 }
 
 #endif
@@ -89,6 +87,7 @@ int checkSpinComplete() {
 }
 
 void startTrackingThrust() {
+    thrustComplete = 0;
     trackingSpin = 0;
     trackingThrust = 1;
 }
