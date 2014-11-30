@@ -9,17 +9,6 @@
 
 void audioReset() {
 
-//    pAUDIO_CLK_PORT = 0;
-//    pAUDIO_RESET_PORT = 1;
-//    pAUDIO_RESET_PORT = 0;
-//
-//    DELAY_MS(5);
-//
-//    pAUDIO_RESET_PORT = 1;
-//    pAUDIO_CLK_PORT = 1;
-//
-//    DELAY_MS(300);
-
     //hmmm
     pAUDIO_CLK_PORT = 1;
     pAUDIO_DATA_PORT = 1;
@@ -50,5 +39,13 @@ void playSound(int sound) {
         DELAY_US(200);
     }
     pAUDIO_DATA_PORT = 1;
+
+}
+
+void setVolume(int vol) {
+
+    // 1 to 8
+
+    playSound(0xFFF0 + (vol - 1));
 
 }

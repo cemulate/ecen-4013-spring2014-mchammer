@@ -121,6 +121,9 @@ void configureLightMCU_SPI() {
 
     pLIGHTMCU_SDO_TRIS = 0;
     pLIGHTMCU_SCK_TRIS = 0;
+
+    pLIGHTMCU_SDO_PORT = 0;
+    pLIGHTMCU_SCK_PORT = 0;
 }
 
 int configureRadio(int short_addr, long long long_addr) {

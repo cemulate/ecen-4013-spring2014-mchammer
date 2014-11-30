@@ -110,11 +110,19 @@ void hammerMain() {
 
     configureLightMCU_SPI();
 
+    int chargeRate = 0;
     char sendString[2] = "x";
     char rxbuf[50];
     char doneString[] = "DONE";
 
-    playSound(HAMMER_SOUND_BOOT);
+    sendLightMCU(0);
+    DELAY_MS(5);
+    sendLightMCU(100);
+
+    DELAY_MS(400);
+
+    playSound(HS_BOOT);
+    DELAY_MS(HS_BOOT_LEN);
     
     while (1) {
 
@@ -125,33 +133,34 @@ void hammerMain() {
         while (!checkSpinComplete());
 
         uprint("Spin complete!");
-        playSound(HAMMER_SOUND_SPINCOMPLETE);
+        playSound(HS_SPINCOMPLETE);
+        DELAY_MS(HS_SPINCOMPLETE_LEN);
 
-        DELAY_MS(1500);
-
-        playSound(HAMMER_SOUND_CHARGING);
+        // This sound is very long, we just start it playing
+        playSound(HS_CHARGING);
 
         uprint("Charging ...");
 
         hs->chargeStatus = 0;
         hs->charging = 1;
-        while (hs->chargeStatus < 100) {
+        while (hs->chargeStatus < hs->health) {
             hs->chargeStatus ++;
-            DELAY_MS(20);
+            DELAY_MS(100);
         }
         hs->charging = 0;
 
-        // No sounds for now
-        uprint("Finished charging!");
+        playSound(HS_SPINCOMPLETE);
+        DELAY_MS(HS_SPINCOMPLETE_LEN);
 
-        playSound(HAMMER_SOUND_SPINCOMPLETE);
+        uprint("Finished charging!");
 
         uprint("Waiting for thrust...");
         startTrackingThrust();
         while (!checkThrustComplete());
 
         uprint("Thrust complete!");
-        playSound(HAMMER_SOUND_FIRE);
+        playSound(HS_FIRE);
+        DELAY_MS(HS_FIRE_LEN);
 
         // Become invincible
         disableIRReceive();
@@ -167,7 +176,7 @@ void hammerMain() {
             uprint("Invalid message from cloud!");
         }
 
-        uprint("Got clousd message");
+        uprint("Got cloud message");
 
         enableIRReceive();
 
@@ -191,7 +200,11 @@ void cloudMain() {
 
     configureCloudLighting();
 
-    playSound(CLOUD_SOUND_BOOT);
+    DELAY_MS(400);
+
+    playSound(CS_BOOT);
+    DELAY_MS(CS_BOOT_LEN);
+
 
     while (1) {
 
@@ -203,7 +216,7 @@ void cloudMain() {
 
         uprint("Got message");
 
-        playSound(CLOUD_SOUND_FIRE);
+        playSound(CS_FIRE);
 
         // Enter manual lighting mode
         cloudLightingSetMode(ALGM_OFF);
@@ -252,11 +265,20 @@ void TEST_RadioReceive() {
 }
 
 void TEST_Audio() {
-    char tx;
-    while(1) {
-        uprint("Enter number of sound to play: ");
-        tx = uart1Rx() - 48;
-        playSound((int)tx);
+    char rx[50];
+    unsigned char vol;
+    unsigned int snd;
+    while (1) {
+        uprint("Enter volume level: ");
+        uart1_gets(rx, 50);
+        vol = atoi(rx);
+        uprint_int("Volume is: ", vol);
+        uprint("Enter sound: ");
+        uart1_gets(rx, 50);
+        snd = atoi(rx);
+        uprint_int("Sound is: ", snd);
+        setVolume(vol);
+        playSound(snd);
     }
 }
 
