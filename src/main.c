@@ -115,14 +115,14 @@ void hammerMain() {
     char rxbuf[50];
     char doneString[] = "DONE";
 
-    sendLightMCU(0);
-    DELAY_MS(5);
-    sendLightMCU(100);
-
     DELAY_MS(400);
 
     playSound(HS_BOOT);
     DELAY_MS(HS_BOOT_LEN);
+
+    while (1) {
+        uprint_int("Hammer health: ", hs->health);
+    }
     
     while (1) {
 
@@ -283,14 +283,33 @@ void TEST_Audio() {
 }
 
 void TEST_LightMCU() {
-    configureLightMCU_SPI();
-
-    int i = 0;
+    char rx[10];
+    unsigned int i, r, g, b, final;
     while (1) {
-        for (i = 1; i <= 100; i ++) {
-            uprint_int("Sending ", i);
-            sendLightMCU(i + 100);
-            DELAY_MS(50);
+        uprint("l to loop, other for special");
+        rx[0] = uart1Rx();
+
+        if (rx[0] == 'l') {
+            for (i = 0; i < 192; i ++) {
+                sendLightMCU(i);
+                DELAY_MS(20);
+            }
+        } else {
+            uprint("Enter r 0-4: ");
+            uart1_gets(rx, 10);
+            r = atoi(rx);
+            uprint("Enter g 0-4: ");
+            uart1_gets(rx, 10);
+            g = atoi(rx);
+            uprint("Enter b 0-4: ");
+            uart1_gets(rx, 10);
+            b = atoi(rx);
+
+            final = 0b11000000 + (r << 4) + (g << 2) + b;
+
+            uprint_int("Sending ", final);
+
+            sendLightMCU(final);
         }
     }
 }

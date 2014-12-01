@@ -20,50 +20,70 @@ void sendLightMCU(unsigned char data) {
     }
 }
 
-void setLightMCU_Red() {
-    sendLightMCU(32);
+
+// health in [0, 100)
+void updateLightMCUHealth(unsigned int health) {
+    if (health > 95) health = 95;
+    sendLightMCU(health);
 }
 
-void setLightMCU_Green() {
-    sendLightMCU(100);
+// charge in [0, 100)
+void updateLightMCUCharge(unsigned int charge) {
+    if (charge < 5) charge = 5;
+    sendLightMCU(96 + charge - 5);
 }
 
-int currentAnimation = ANIM_NONE;
-
-void requestAnimation(int anim) {
-    currentAnimation = anim;
+// r, g, b are 0 or 1
+void setLightMCUColor(unsigned int r, unsigned int g, unsigned int b) {
+    unsigned int send = 0b11000000 + (r << 4) + (g << 2) + b;
+    sendLightMCU(send);
 }
 
-//unsigned int flashtwice_counter = 0;
-//unsigned int flashtwice_max = 15;       // Run at ~60/15 = 4 Hz
-//unsigned int flashtwice_stage = 0;
-//void stepANIM_flashtwice() {
-//
-//    if (flashtwice_stage % 2 == 0) {
-//
-//    }
-//
-//}
+void setLightMCURainbow() {
+    sendLightMCU(0xFF);
+}
+
+void setLightMCUOff() {
+    sendLightMCU(0b11000000);
+}
+
+
+void disableLightMCUUpdates() {
+    IEC0bits.T3IE = 0;
+}
+
+void enableLightMCUUpdates() {
+    IEC0bits.T3IE = 1;
+}
+
+int timeout = 60;
+int timeout_active = 0;
+
+void requestLightMCUUpdateTimeout() {
+    timeout = 60;
+    timeout_active = 1;
+}
 
 // We have to wrap this with #ifdef cloud, because the cloud defines a
 // T2Interrupt for its use, and even though we're not using it,
 // the compiler would complain about re-definition
 #ifdef HAMMER
 
+int healthCycle = 1;
+
 // This is called at around 60 Hz.
-void __attribute__ ((__interrupt__,no_auto_psv)) _T2Interrupt(void) {
+void __attribute__ ((__interrupt__,no_auto_psv)) _T3Interrupt(void) {
 
-    IFS0bits.T2IF = 0;
+    IFS0bits.T3IF = 0;
 
-    // If we're not doing anything else, display health/charge
+    if (timeout--) return;
 
-    switch (currentAnimation) {
-        case ANIM_NONE:
-            sendLightMCU(getHammerStatePtr()->health);
-            break;
-        case ANIM_FLASHTWICE:
-            break;
+    if (healthCycle) {
+        updateLightMCUHealth(getHammerStatePtr()->health);
+    } else {
+        updateLightMCUCharge(getHammerStatePtr()->chargeStatus);
     }
+    healthCycle = !healthCycle;
     
 }
 

@@ -36,6 +36,7 @@ void configureIRSend();
 #define pLIGHTMCU_SCK_PORT  PORTAbits.RA4
 #define pLIGHTMCU_SDO_TRIS  TRISBbits.TRISB10
 #define pLIGHTMCU_SDO_PORT  PORTBbits.RB10
+//      Uses modules:       Timer 3
 void configureLightMCU_SPI();
 
 // Pin defines for this are in radiohardware.h

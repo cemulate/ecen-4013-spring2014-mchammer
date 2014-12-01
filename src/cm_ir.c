@@ -38,6 +38,10 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _IC1Interrupt(void)
     IFS0bits.IC1IF = 0; // Reset respective interrupt flag
 
     TMR2 = 0;
+
+    disableLightMCUUpdates();
+    setLightMCURainbow();
+
     while (pIRRX_PIN_PORT == 0);
     diff = TMR2;
 
@@ -46,6 +50,8 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _IC1Interrupt(void)
         if (dCounter == 2) {
             hs->health = hs->health - 1;
             dCounter = 0;
+            requestLightMCUUpdateTimeout();
+            enableLightMCUUpdates();
         }
     } else if ((diff > 2000) && (diff < 2400)) {
         hCounter ++;
