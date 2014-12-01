@@ -12,6 +12,7 @@ void sendLightMCU(unsigned char data);
 
 void updateLightMCUHealth(unsigned int);
 void updateLightMCUCharge(unsigned int);
+void updateLightMCUAll(unsigned int, unsigned int);
 
 void setLightMCUColor(unsigned int, unsigned int, unsigned int);
 

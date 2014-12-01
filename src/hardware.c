@@ -125,7 +125,7 @@ void configureLightMCU_SPI() {
     pLIGHTMCU_SDO_PORT = 0;
     pLIGHTMCU_SCK_PORT = 0;
 
-    configureTimer3_60();
+    //configureTimer3_60();
 
 }
 

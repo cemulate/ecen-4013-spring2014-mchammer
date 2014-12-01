@@ -39,9 +39,6 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _IC1Interrupt(void)
 
     TMR2 = 0;
 
-    disableLightMCUUpdates();
-    setLightMCURainbow();
-
     while (pIRRX_PIN_PORT == 0);
     diff = TMR2;
 
@@ -50,14 +47,16 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _IC1Interrupt(void)
         if (dCounter == 2) {
             hs->health = hs->health - 1;
             dCounter = 0;
-            requestLightMCUUpdateTimeout();
-            enableLightMCUUpdates();
+            updateLightMCUHealth(hs->health);
+            playSound(HS_DAMAGED);
         }
     } else if ((diff > 2000) && (diff < 2400)) {
         hCounter ++;
         if (hCounter == 2) {
             hs->health = hs->health + 1;
             hCounter = 0;
+            updateLightMCUHealth(hs->health);
+            playSound(HS_HEALED);
         }
     } else {
         dCounter = 0;
@@ -109,33 +108,6 @@ int irSendState;
 int payloadLength = 20;
 int sendComplete = 0;
 
-//void sendDamagePacket() {
-//    INT_OFF();
-//    pcnt = 0;
-//    irSendState = 1;
-//    payloadLength = 20;
-//    sendComplete = 0;
-//    IEC1bits.T4IE = 1;
-//
-//    while (!sendComplete);
-//
-//    INT_ON();
-//    IEC1bits.T4IE = 0;
-//
-//}
-//
-//#define SENDMASK(p)     (IN_RANGE(p, 0, 10) ||                      \
-//                         IN_RANGE(p, 150, 150+payloadLength) ||     \
-//                         IN_RANGE(p, 300, 300+payloadLength) ||     \
-//                         IN_RANGE(p, 450, 600))                     \
-//
-//void __attribute__ ((__interrupt__,no_auto_psv)) _T4Interrupt(void) {
-//    IFS1bits.T4IF = 0;
-//    pLED_PIN_PORT = SENDMASK(pcnt) ? irSendState : 0;
-//    irSendState = !irSendState;
-//    if (irSendState) pcnt ++;
-//    if (pcnt == 600) sendComplete = 1;
-//}
 
 void sendHealPacket() {
     

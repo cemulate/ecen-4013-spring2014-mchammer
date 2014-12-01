@@ -33,6 +33,12 @@ void updateLightMCUCharge(unsigned int charge) {
     sendLightMCU(96 + charge - 5);
 }
 
+void updateLightMCUAll(unsigned int health, unsigned int charge) {
+    updateLightMCUHealth(health);
+    DELAY_MS(30);
+    updateLightMCUCharge(charge);
+}
+
 // r, g, b are 0 or 1
 void setLightMCUColor(unsigned int r, unsigned int g, unsigned int b) {
     unsigned int send = 0b11000000 + (r << 4) + (g << 2) + b;
@@ -76,14 +82,17 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _T3Interrupt(void) {
 
     IFS0bits.T3IF = 0;
 
-    if (timeout--) return;
-
-    if (healthCycle) {
-        updateLightMCUHealth(getHammerStatePtr()->health);
-    } else {
-        updateLightMCUCharge(getHammerStatePtr()->chargeStatus);
-    }
-    healthCycle = !healthCycle;
+//    if (!timeout_active) {
+//        if (healthCycle) {
+//            updateLightMCUHealth(getHammerStatePtr()->health);
+//        } else {
+//            updateLightMCUCharge(getHammerStatePtr()->chargeStatus);
+//        }
+//        healthCycle = !healthCycle;
+//    } else {
+//        timeout --;
+//        if (timeout == 0) timeout_active = 0;
+//    }
     
 }
 

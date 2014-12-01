@@ -22,7 +22,7 @@
 #define CS_FIRE                 1
 
 #define HS_BOOT_LEN             1420
-#define HS_SPINCOMPLETE_LEN     560
+#define HS_SPINCOMPLETE_LEN     1255
 #define HS_CHARGING_LEN         31570
 #define HS_CHARGECOMPLETE_LEN   2130
 #define HS_FIRE_LEN             1390
@@ -38,6 +38,7 @@
 void audioReset();
 
 void playSound(int sound);
+void setVolume(int vol);
 
 
 #endif	/* CM_SOUNDEFFECTS_H */

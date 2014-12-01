@@ -110,6 +110,8 @@ void hammerMain() {
 
     configureLightMCU_SPI();
 
+    updateLightMCUAll(hs->health, hs->charge);
+
     int chargeRate = 0;
     char sendString[2] = "x";
     char rxbuf[50];
@@ -119,14 +121,12 @@ void hammerMain() {
 
     playSound(HS_BOOT);
     DELAY_MS(HS_BOOT_LEN);
-
-    while (1) {
-        uprint_int("Hammer health: ", hs->health);
-    }
     
     while (1) {
 
         uprint("Beginning of main loop");
+        hs->charge = 0;
+        updateLightMCUAll(hs->health, hs->charge);
 
         uprint("Waiting for spin...");
         startTrackingSpin();
@@ -141,16 +141,15 @@ void hammerMain() {
 
         uprint("Charging ...");
 
-        hs->chargeStatus = 0;
-        hs->charging = 1;
-        while (hs->chargeStatus < hs->health) {
-            hs->chargeStatus ++;
+        hs->charge = 0;
+        while (hs->charge < hs->health) {
+            hs->charge ++;
+            updateLightMCUCharge(hs->charge);
             DELAY_MS(100);
         }
-        hs->charging = 0;
 
-        playSound(HS_SPINCOMPLETE);
-        DELAY_MS(HS_SPINCOMPLETE_LEN);
+        playSound(HS_CHARGECOMPLETE);
+        DELAY_MS(HS_CHARGECOMPLETE_LEN);
 
         uprint("Finished charging!");
 
@@ -161,6 +160,8 @@ void hammerMain() {
         uprint("Thrust complete!");
         playSound(HS_FIRE);
         DELAY_MS(HS_FIRE_LEN);
+
+        setLightMCURainbow();
 
         // Become invincible
         disableIRReceive();
@@ -176,9 +177,12 @@ void hammerMain() {
             uprint("Invalid message from cloud!");
         }
 
+        enableIRReceive();
         uprint("Got cloud message");
 
-        enableIRReceive();
+
+        setLightMCUOff();
+        DELAY_MS(30);
 
     }
 
@@ -217,6 +221,7 @@ void cloudMain() {
         uprint("Got message");
 
         playSound(CS_FIRE);
+        // Don't wait for this sound
 
         // Enter manual lighting mode
         cloudLightingSetMode(ALGM_OFF);
@@ -291,8 +296,9 @@ void TEST_LightMCU() {
 
         if (rx[0] == 'l') {
             for (i = 0; i < 192; i ++) {
+                uprint_int("Sending ", i);
                 sendLightMCU(i);
-                DELAY_MS(20);
+                DELAY_MS(50);
             }
         } else {
             uprint("Enter r 0-4: ");
