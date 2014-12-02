@@ -41,7 +41,7 @@ void updateLightMCUAll(unsigned int health, unsigned int charge) {
 
 // r, g, b are 0 or 1
 void setLightMCUColor(unsigned int r, unsigned int g, unsigned int b) {
-    unsigned int send = 0b11000000 + (r << 4) + (g << 2) + b;
+    unsigned int send = 0b11010000 + (r << 2) + (g << 1) + b;
     sendLightMCU(send);
 }
 
@@ -51,6 +51,10 @@ void setLightMCURainbow() {
 
 void setLightMCUOff() {
     sendLightMCU(0b11000000);
+}
+
+void setLightMCUHitAnim() {
+    sendLightMCU(0b11011000);
 }
 
 

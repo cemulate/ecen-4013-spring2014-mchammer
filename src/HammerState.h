@@ -12,6 +12,7 @@ typedef struct {
 
     int health;
     int charge;
+    int charging;
 
 } HammerState;
 
@@ -19,6 +20,12 @@ typedef struct {
 void initHammerState();
 
 HammerState * getHammerStatePtr();
+
+void healthUp();
+void healthDown();
+
+void permaDeath();
+void stun();
 
 #endif	/* HAMMERSTATE_H */
 

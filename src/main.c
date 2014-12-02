@@ -112,7 +112,7 @@ void hammerMain() {
 
     updateLightMCUAll(hs->health, hs->charge);
 
-    int chargeRate = 0;
+    int chargePeriod = 100;
     char sendString[2] = "x";
     char rxbuf[50];
     char doneString[] = "DONE";
@@ -142,11 +142,13 @@ void hammerMain() {
         uprint("Charging ...");
 
         hs->charge = 0;
-        while (hs->charge < hs->health) {
+        hs->charging = 1;
+        while (hs->charge < 100) {
             hs->charge ++;
             updateLightMCUCharge(hs->charge);
-            DELAY_MS(100);
+            DELAY_MS((0.9 * hs->health) + 10);
         }
+        hs->charging = 0;
 
         playSound(HS_CHARGECOMPLETE);
         DELAY_MS(HS_CHARGECOMPLETE_LEN);

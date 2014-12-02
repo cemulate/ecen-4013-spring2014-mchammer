@@ -18,7 +18,7 @@
 unsigned int c1 = 0, c2 = 0;
 unsigned int diff;
 int inPacket = 0;
-int dCounter = 0, hCounter = 0;
+int dCounter = 0, hCounter = 0, sCounter = 0;
 int gotPulse = 0;
 int rxState = 0;
 
@@ -30,6 +30,7 @@ void initIRReceive() {
     inPacket = 0;
     dCounter = 0;
     hCounter = 0;
+    sCounter = 0;
 }
 
 void __attribute__ ((__interrupt__,no_auto_psv)) _IC1Interrupt(void)
@@ -45,22 +46,29 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _IC1Interrupt(void)
     if ((diff > 1350) && (diff < 1750)) {
         dCounter ++;
         if (dCounter == 2) {
-            hs->health = hs->health - 1;
+            healthDown();
             dCounter = 0;
             updateLightMCUHealth(hs->health);
-            playSound(HS_DAMAGED);
+            if (!hs->charging) playSound(HS_DAMAGED);
         }
     } else if ((diff > 2000) && (diff < 2400)) {
         hCounter ++;
         if (hCounter == 2) {
-            hs->health = hs->health + 1;
+            healthUp();
             hCounter = 0;
             updateLightMCUHealth(hs->health);
-            playSound(HS_HEALED);
+            if (!hs->charging) playSound(HS_HEALED);
+        }
+    } else if ((diff > 2650) && (diff < 3050)) {
+        sCounter ++;
+        if (sCounter == 2) {
+            sCounter = 0;
+            stun();
         }
     } else {
         dCounter = 0;
         hCounter = 0;
+        sCounter = 0;
     }
 }
 

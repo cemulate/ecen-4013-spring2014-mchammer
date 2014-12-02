@@ -18,6 +18,7 @@ void setLightMCUColor(unsigned int, unsigned int, unsigned int);
 
 void setLightMCURainbow();
 void setLightMCUOff();
+void setLightMCUHitAnim();
 
 void disableLightMCUUpdates();
 void enableLightMCUUpdates();
