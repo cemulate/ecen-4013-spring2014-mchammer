@@ -26,6 +26,9 @@ unsigned long long int runningSum;
 
 #define SPIN_COUNT_THRESHOLD    3
 
+#define SPIN_ACC_THRESHOLD      2400
+#define THRUST_ACC_THRESHOLD    2000
+
 int trackingSpin;
 int spinCounter;
 
@@ -53,7 +56,7 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _T1Interrupt(void) {
             nSamples = 0;
             runningSum = 0;
 
-            if (result < 2500) {
+            if (result < SPIN_ACC_THRESHOLD) {
                 spinCounter = 0;
             } else {
                 spinCounter ++;
@@ -64,7 +67,7 @@ void __attribute__ ((__interrupt__,no_auto_psv)) _T1Interrupt(void) {
         }
     } else if (trackingThrust) {
 
-        thrustComplete = (readADCRaw() > 2000);
+        thrustComplete = (readADCRaw() > THRUST_ACC_THRESHOLD);
         if (thrustComplete) trackingThrust = 0;
 
     }

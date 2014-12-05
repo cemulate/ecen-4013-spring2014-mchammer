@@ -112,7 +112,6 @@ void hammerMain() {
 
     updateLightMCUAll(hs->health, hs->charge);
 
-    int chargePeriod = 100;
     char sendString[2] = "x";
     char rxbuf[50];
     char doneString[] = "DONE";
@@ -136,6 +135,9 @@ void hammerMain() {
         playSound(HS_SPINCOMPLETE);
         DELAY_MS(HS_SPINCOMPLETE_LEN);
 
+        setVolume(5);
+        // Charging is really damn loud
+
         // This sound is very long, we just start it playing
         playSound(HS_CHARGING);
 
@@ -150,6 +152,9 @@ void hammerMain() {
         }
         hs->charging = 0;
 
+        setVolume(8);
+        // Back to normal
+
         playSound(HS_CHARGECOMPLETE);
         DELAY_MS(HS_CHARGECOMPLETE_LEN);
 
@@ -158,6 +163,8 @@ void hammerMain() {
         uprint("Waiting for thrust...");
         startTrackingThrust();
         while (!checkThrustComplete());
+
+        setLightMCUHitAnim();
 
         uprint("Thrust complete!");
         playSound(HS_FIRE);
