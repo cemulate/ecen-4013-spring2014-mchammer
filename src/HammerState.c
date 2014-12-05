@@ -1,9 +1,7 @@
-#include <stdlib.h>
-#include <xc.h>
-
-#include "cm_uart.h"
 #include "HammerState.h"
 #include "Common.h"
+
+#include "cm_uart.h"
 #include "cm_lightmcu.h"
 #include "cm_soundeffects.h"
 

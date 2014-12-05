@@ -1,13 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <xc.h>
+#include "Common.h"
 #include "hardware.h"
 
 #include "cm_uart.h"
-
-#include "Common.h"
-
 #include "cm_cloudlighting.h"
 
 unsigned int display[16];

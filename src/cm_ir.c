@@ -1,17 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <xc.h>
+#include "HammerState.h"
+#include "Common.h"
 #include "hardware.h"
 
 #include "cm_uart.h"
 #include "cm_ir.h"
 #include "cm_soundeffects.h"
-#include "cm_accelerometer.h"
 #include "cm_lightmcu.h"
-#include "HammerState.h"
-
-#include "Common.h"
 
 #define IN_RANGE(x, a, b)       ((x >= a) && (x < b))
 

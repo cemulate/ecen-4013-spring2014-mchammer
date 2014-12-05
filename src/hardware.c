@@ -1,18 +1,15 @@
-#include <stdlib.h>
-#include <stdio.h>
-
-#include <xc.h>
+#include "Common.h"
 #include "hardware.h"
-
-// For certain functions called in the configure... routines
-#include "cm_ir.h"
-#include "cm_radio.h"
-#include "MRF24J40.h"
 
 // There are specific files, radiohardware.h and
 // radiohardware.c that specifically deal with the
 // wireless radio
 #include "radiohardware.h"
+
+// For certain functions called in the configure... routines
+#include "cm_ir.h"
+#include "cm_radio.h"
+#include "MRF24J40.h"
 
 void configureAccelerometer() {
 

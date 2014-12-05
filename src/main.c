@@ -42,28 +42,22 @@
 // exporting the internal clock signal. Datasheet sec 25.1
 
 #pragma config FWDTEN = OFF
-// Turn that watchdog shit the fuck off
+// Turn the watchdog off
 
 // --------------------------------------------------------------
 
+#include "HammerState.h"
+#include "Common.h"
+#include "hardware.h"
+#include "radiohardware.h"
+
 #include "cm_uart.h"
 #include "cm_spi.h"
-
-#include "radiohardware.h"
-#include "MRF24J40.h"
 #include "cm_radio.h"
-
 #include "cm_accelerometer.h"
 #include "cm_soundeffects.h"
-
 #include "cm_lightmcu.h"
-
 #include "cm_ir.h"
-
-#include "Common.h"
-
-#include "HammerState.h"
-
 #include "cm_cloudlighting.h"
 
 void blinkForever();

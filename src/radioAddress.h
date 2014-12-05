@@ -5,6 +5,8 @@
  * Created on October 20, 2014, 5:36 AM
  */
 
+// This file is needed by the MRF24J40 library
+
 #ifndef RADIOADDRESS_H
 #define	RADIOADDRESS_H
 

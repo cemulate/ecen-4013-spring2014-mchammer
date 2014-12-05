@@ -1,13 +1,11 @@
-#include <stdlib.h>
-#include <math.h>
-
-#include <xc.h>
-#include "hardware.h"
 #include "Common.h"
 #include "HammerState.h"
+#include "hardware.h"
 
 #include "cm_lightmcu.h"
 #include "cm_uart.h"
+
+#include <math.h>
 
 void sendLightMCU(unsigned char data) {
     pLIGHTMCU_SCK_PORT = 0;

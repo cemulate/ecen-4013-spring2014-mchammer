@@ -1,11 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <xc.h>
+#include "Common.h"
 #include "hardware.h"
 
 #include "cm_uart.h"
+
+#include <string.h>
 
 void uart1_puts(char *message) {
     int size = strlen(message);

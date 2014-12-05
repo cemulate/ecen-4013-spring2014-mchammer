@@ -1,7 +1,4 @@
-#include <stdlib.h>
-#include <string.h>
-
-#include <xc.h>
+#include "Common.h"
 
 #include "cm_spi.h"
 #include "cm_uart.h"

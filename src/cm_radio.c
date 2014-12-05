@@ -1,15 +1,14 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-
-#include <xc.h>
+#include "Common.h"
+#include "HammerState.h"
 #include "hardware.h"
+#include "radiohardware.h"
 
 #include "cm_uart.h"
 #include "cm_radio.h"
 
-#include "radiohardware.h"
 #include "MRF24J40.h"
+
+#include <string.h>
 
 typedef struct {
 	WORD	txCnt;				// Counter incremented by sender

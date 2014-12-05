@@ -1,6 +1,3 @@
-#include <stdlib.h>
-
-#include <xc.h>
 #include "Common.h"
 #include "hardware.h"
 

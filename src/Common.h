@@ -10,6 +10,11 @@
 
 #include <libpic30.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <xc.h>
+
 #define FOSC    (7370000ULL)
 #define FCY     (FOSC/2)
 
